@@ -18,7 +18,7 @@ export default (_env, argv) => ({
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: 'babel-loader',
         exclude: /node_modules/,
       },
     ],
