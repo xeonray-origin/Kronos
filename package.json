@@ -1,0 +1,26 @@
+{
+  "name": "kronos",
+  "version": "0.0.1",
+  "description": "A mern stack productivity app.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/xeonray-origin/Kronos.git"
+  },
+  "keywords": [
+    "MERN",
+    "ReactJS",
+    "NodeJS",
+    "ExpressJS",
+    "TodoApp"
+  ],
+  "author": "xeonray-origin",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/xeonray-origin/Kronos/issues"
+  },
+  "homepage": "https://github.com/xeonray-origin/Kronos#readme"
+}
