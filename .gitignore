@@ -3,6 +3,8 @@ dist/
 build/
 *.tsbuildinfo
 coverage/
+*.d.ts.map
+*.d.ts
 
 # Dependencies
 node_modules/
