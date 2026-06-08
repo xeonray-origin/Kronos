@@ -2,9 +2,18 @@
   "name": "kronos",
   "version": "0.0.1",
   "description": "A mern stack productivity app.",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "pnpm --filter @kronos/client build",
+    "build:clean": "tsc --build --clean",
+    "typecheck": "tsc --build --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "dev:server": "pnpm --filter @kronos/server dev",
+    "dev:client": "pnpm --filter @kronos/client dev"
   },
   "repository": {
     "type": "git",
@@ -22,5 +31,15 @@
   "bugs": {
     "url": "https://github.com/xeonray-origin/Kronos/issues"
   },
-  "homepage": "https://github.com/xeonray-origin/Kronos#readme"
+  "homepage": "https://github.com/xeonray-origin/Kronos#readme",
+  "engines": {
+    "node": "^22.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^10.4.1",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.1"
+  }
 }
