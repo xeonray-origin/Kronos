@@ -15,7 +15,14 @@
     "test": "jest",
     "dev:server": "pnpm --filter @kronos/server dev",
     "dev:client": "pnpm --filter @kronos/client dev",
-    "prepare": "node .husky/install.mjs"
+    "prepare": "node .husky/install.mjs",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f mongo",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up",
+    "docker:dev:down": "docker compose -f docker-compose.dev.yml down"
   },
   "repository": {
     "type": "git",
@@ -46,7 +53,7 @@
     "jest": "^29.7.0",
     "prettier": "^3.8.3",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.1"
+    "typescript-eslint": "^8.61.0"
   },
   "config": {
     "commitizen": {

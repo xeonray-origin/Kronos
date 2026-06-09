@@ -6,27 +6,30 @@ Kronos is a high-performance, power-user task management application built on th
 
 - Node.js 22+
 - pnpm 10.15.0+
+- Locally installed docker
 
-## Quick Start
+## Docker installation guide
+
+To install Docker, download and run the installer for your operating system from the official Docker website. After installation, verify it by running `docker --version` in a terminal. For detailed setup instructions, see the Docker docs:
+
+- https://docs.docker.com/get-docker/
+
+## Pnpm installation guide
+
+If your Node.js includes Corepack (Node 16.14+ / recommended Node 22+), enable it and install/activate pnpm with:
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Development
-pnpm dev
-
-# Build
-pnpm build
-
-# Lint
-pnpm lint
-pnpm lint:fix
+corepack enable
+corepack prepare pnpm@latest --activate
 ```
+
+Verify with `pnpm --version`.
+
+See the pnpm installation docs for more details: https://pnpm.io/installation
 
 ## Scripts
 
-### These commands should run from root.
+### Run thes commands for project root.
 
 - `pnpm install` - Install all dependencies
 - `pnpm dev` - Start dev servers (server + client)
@@ -34,7 +37,7 @@ pnpm lint:fix
 - `pnpm lint` - Lint all modules
 - `pnpm lint:fix` - Fix linting issues
 
-## Technologies
+## Tech stack
 
 - **Backend**: Express 5.x, TypeScript, Webpack
 - **Frontend**: React 19.x, TypeScript, Webpack

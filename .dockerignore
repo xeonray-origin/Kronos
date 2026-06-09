@@ -1,0 +1,7 @@
+node_modules
+modules/*/node_modules
+modules/*/dist
+.git
+.env
+*.log
+coverage
