@@ -8,6 +8,16 @@ Kronos is a high-performance, power-user task management application built on th
 
 Detailed summary of the app idea: [click here](./documentation/idea.md)
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Docker Installation Guide](#docker-installation-guide)
+- [Pnpm Installation Guide](#pnpm-installation-guide)
+- [Getting Started](#getting-started)
+- [Available Commands](#available-commands)
+- [Tech Stack](#tech-stack)
+- [Server Architecture](./documentation/server.md)
+
 ## Prerequisites
 
 - Node.js 22+

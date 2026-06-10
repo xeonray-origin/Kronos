@@ -7,17 +7,14 @@ import { IValidator } from '@/interfaces';
 import { userValidator } from '@/utils';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
-const userDao = new UserDAO();
+const userDAO = new services.auth.DAO();
+const validator = services.auth.validator as unknown as IValidator<AuthUser>;
 
-const controller = new AuthController(
-  new RegisterUser(
-    userValidator as unknown as IValidator<AuthUser>,
-    userDao,
-    //placeholder for now
-    async (password: string) => Promise.resolve({ password, salt: '' }),
-  ),
+const RegisterUserAction = new RegisterUser(validator, userDAO, async (password: string) =>
+  Promise.resolve({ password, salt: '' }),
 );
 
+const controller = new AuthController(RegisterUserAction);
 const router: Router = express.Router();
 
 router.post('/register', async (request: Request, response: Response, next: NextFunction) => {

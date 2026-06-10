@@ -3,7 +3,7 @@ import { userValidator } from '@/utils';
 
 export default {
   auth: {
-    validators: userValidator,
+    validator: userValidator,
     DAO: UserDAO,
   },
 };
