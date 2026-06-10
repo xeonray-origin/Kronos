@@ -1,4 +1,5 @@
 #!/bin/sh
+pnpm typecheck
 pnpm run format
 git update-index --again
 pnpm test
