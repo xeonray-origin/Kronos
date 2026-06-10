@@ -1,0 +1,33 @@
+import { AuthUser, User } from '@/entities';
+import { IAction, IUserDAO, IValidator } from '@/interfaces';
+import _ from 'lodash';
+
+class RegisterUser implements IAction<User> {
+  constructor(
+    protected validator: IValidator<AuthUser>,
+    protected userDAO: IUserDAO,
+    protected encryptPassword: (password: string) => Promise<{ password: string; salt: string }>,
+  ) {}
+  async call(
+    payload: Pick<
+      AuthUser,
+      'email' | 'name' | 'password' | 'role' | 'salt' | 'confirmPassword' | 'phoneNumber' | 'id'
+    >,
+  ): Promise<User> {
+    const { isValid, errors, value } = this.validator.validate(payload);
+    if (!isValid) {
+      throw new Error(`Validation failed: ${errors?.join(', ')}`);
+    }
+    const existingUser = await this.userDAO.findByEmail(payload.email);
+    if (existingUser) {
+      throw new Error('User with this email already exists');
+    }
+    const { confirmPassword, ...finalPayload } = payload;
+    const { password, salt } = await this.encryptPassword(finalPayload.password);
+    _.assign(finalPayload, { password, salt });
+    const createdUser = await this.userDAO.create(finalPayload as AuthUser);
+    return createdUser;
+  }
+}
+
+export default RegisterUser;

@@ -1,26 +1,23 @@
-'use strict';
-
-/** @type {import('jest').Config} */
-const config = {
-  displayName: 'server',
+module.exports = {
+  preset: 'ts-jest',
   testEnvironment: 'node',
+  rootDir: 'src',
+  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
+  },
   transform: {
-    '^.+\\.tsx?$': [
-      'babel-jest',
+    '^.+\\.ts?$': [
+      'ts-jest',
       {
-        configFile: false,
-        presets: [
-          ['@babel/preset-env', { targets: { node: 'current' }, modules: 'commonjs' }],
-          '@babel/preset-typescript',
-        ],
+        useESM: false,
+        tsconfig: {
+          module: 'CommonJS',
+          moduleResolution: 'bundler',
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+        },
       },
     ],
   },
-  moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
-  testMatch: ['<rootDir>/src/**/__tests__/**/*.ts', '<rootDir>/src/**/?(*.)+(spec|test).ts'],
-  moduleFileExtensions: ['ts', 'js', 'json'],
 };
-
-module.exports = config;
