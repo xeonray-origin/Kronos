@@ -1,14 +1,48 @@
-import express from 'express';
+import express, { Express } from 'express';
+import cors from 'cors';
+import routes from '@/routes';
+import methodOverride from 'method-override';
+import { IError } from '@/interfaces';
 
-const app = express();
+const app: Express = express();
 const port = process.env['PORT'] ?? 8080;
 
-app.use(express.json());
+const METHODS_ALLOWED = 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS';
 
-app.get('/', (_req, res) => {
-  res.json({ message: 'Kronos API' });
+app.use(express.json());
+app.use(
+  cors({
+    origin: '*',
+    methods: METHODS_ALLOWED,
+    credentials: true,
+  }),
+);
+
+app.get('/health-check', (_req, res) => {
+  res.json({ message: 'All systems functioning as expected !!!' });
+});
+
+routes.attach(app);
+
+app.use(methodOverride());
+
+// app.use('*', (req: express.Request, res: express.Response) => {
+//   res.status(404).send({
+//     error: 'NotFound',
+//     message: `Cannot ${req.method} ${req.baseUrl}`,
+//   });
+// });
+
+app.use((err: IError, _req: express.Request, res: express.Response) => {
+  console.error(err);
+  res.status(err.httpStatusCode || 500).send({
+    error: err.message,
+    details: err?.details,
+  });
 });
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+export default app;

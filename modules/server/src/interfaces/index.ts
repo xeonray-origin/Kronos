@@ -1,4 +1,4 @@
-import { IAction, IValidationResult, IValidator } from './generic.interface';
+import { IAction, IValidationResult, IValidator, IRequest, IError } from './generic.interface';
 import { IName, IUserDAO } from './user.interface';
 
-export type { IAction, IName, IUserDAO, IValidationResult, IValidator };
+export type { IAction, IName, IUserDAO, IValidationResult, IValidator, IRequest, IError };
