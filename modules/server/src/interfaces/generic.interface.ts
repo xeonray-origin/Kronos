@@ -7,6 +7,7 @@ export interface IValidationResult<T> {
 }
 
 export interface IError {
+  type: string;
   message: string;
   httpStatusCode?: number;
   details?: string;

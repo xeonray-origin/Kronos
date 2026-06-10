@@ -1,4 +1,5 @@
 import { RegisterUser } from '@/actions';
+import { services } from '@/config';
 import AuthController from '@/controllers/auth.controller';
 import { UserDAO } from '@/dao';
 import { AuthUser, User } from '@/entities';

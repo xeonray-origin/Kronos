@@ -1,3 +1,3 @@
-import userValidator from './validations/user.validator';
+import userValidator from './validators/user.validator';
 
 export { userValidator };

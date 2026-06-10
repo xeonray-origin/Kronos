@@ -4,6 +4,7 @@ import { IUserDAO } from '@/interfaces';
 export default class UserDAO implements IUserDAO {
   async create(user: User): Promise<User> {
     // Implement the logic to create a user in the database
+    console.log('Creating user:', user);
     return user;
   }
 

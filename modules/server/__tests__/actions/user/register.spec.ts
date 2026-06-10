@@ -116,7 +116,7 @@ describe('RegisterUser', () => {
   });
 
   describe('validation errors', () => {
-    it('should throw error when validation fails', async () => {
+    it('should throw error when validation fails with array errors', async () => {
       const validationErrors = ['email is invalid', 'password is too weak'];
 
       mockValidator.validate.mockReturnValue({
@@ -144,6 +144,52 @@ describe('RegisterUser', () => {
       await expect(registerUser.call(validPayload)).rejects.toThrow(
         'Validation failed: password is required',
       );
+    });
+
+    it('should throw error when validation fails with Zod error format', async () => {
+      const zodErrors = {
+        issues: [{ message: 'email is invalid' }, { message: 'password is too weak' }],
+      } as any;
+
+      mockValidator.validate.mockReturnValue({
+        isValid: false,
+        errors: zodErrors,
+        value: null,
+      });
+
+      await expect(registerUser.call(validPayload)).rejects.toThrow(
+        'Validation failed: email is invalid, password is too weak',
+      );
+
+      expect(mockUserDAO.findByEmail).not.toHaveBeenCalled();
+      expect(mockEncryptPassword).not.toHaveBeenCalled();
+      expect(mockUserDAO.create).not.toHaveBeenCalled();
+    });
+
+    it('should throw error with single Zod validation error', async () => {
+      const zodErrors = {
+        issues: [{ message: 'password is required' }],
+      } as any;
+
+      mockValidator.validate.mockReturnValue({
+        isValid: false,
+        errors: zodErrors,
+        value: null,
+      });
+
+      await expect(registerUser.call(validPayload)).rejects.toThrow(
+        'Validation failed: password is required',
+      );
+    });
+
+    it('should handle undefined errors gracefully', async () => {
+      mockValidator.validate.mockReturnValue({
+        isValid: false,
+        errors: undefined,
+        value: null,
+      });
+
+      await expect(registerUser.call(validPayload)).rejects.toThrow('Validation failed:');
     });
   });
 
