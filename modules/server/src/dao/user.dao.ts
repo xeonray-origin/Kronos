@@ -1,26 +1,32 @@
 import { User } from '@/entities';
 import { IUserDAO } from '@/interfaces';
+import { client } from './client';
+import { User as UserModel } from '@/models';
 
 export default class UserDAO implements IUserDAO {
   async create(user: User): Promise<User> {
-    // Implement the logic to create a user in the database
-    console.log('Creating user:', user);
-    return user;
+    const createdUser = await UserModel.create(user);
+    return createdUser.toObject() as unknown as User;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    // Implement the logic to find a user by email in the database
-    return null;
+    const user = await UserModel.findOne({ email });
+    return user ? (user.toObject() as unknown as User) : null;
   }
 
   async findById(id: number): Promise<User | null> {
-    // Implement the logic to find a user by ID in the database
-    return null;
+    const user = await UserModel.findById(id);
+    return user ? (user.toObject() as unknown as User) : null;
   }
 
   async update(id: number, user: Partial<User>): Promise<User> {
-    return { id, ...user } as User;
+    const UserModel = client.model('User');
+    const updatedUser = await UserModel.findByIdAndUpdate(id, user, { new: true });
+    return updatedUser ? (updatedUser.toObject() as unknown as User) : ({} as User);
   }
 
-  async delete(id: number): Promise<void> {}
+  async delete(id: number): Promise<void> {
+    const UserModel = client.model('User');
+    await UserModel.findByIdAndDelete(id);
+  }
 }

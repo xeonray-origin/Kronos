@@ -1,3 +1,3 @@
 import UserDAO from './user.dao';
-
-export { UserDAO };
+import { client } from './client';
+export { UserDAO, client };

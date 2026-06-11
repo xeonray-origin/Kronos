@@ -1,4 +1,5 @@
 import { AuthUser, User } from '@/entities';
+import { ValidationError } from '@/errors';
 import { IAction, IUserDAO, IValidator } from '@/interfaces';
 import _ from 'lodash';
 
@@ -18,11 +19,11 @@ class RegisterUser implements IAction<User> {
       const errorMessages = Array.isArray(errors)
         ? errors
         : errors.issues.map((issue) => issue.message);
-      throw new Error(`Validation failed: ${errorMessages.join(', ')}`);
+      throw new ValidationError(`Validation failed: ${errorMessages.join(', ')}`);
     }
     const existingUser = await this.userDAO.findByEmail(payload.email);
     if (existingUser) {
-      throw new Error('User with this email already exists');
+      throw new ValidationError('User with this email already exists');
     }
     const { confirmPassword, ...finalPayload } = payload;
     const { password, salt } = await this.encryptPassword(finalPayload.password);

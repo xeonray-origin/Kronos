@@ -1,3 +1,4 @@
 import services from './services';
+import appConfig from './app';
 
-export { services };
+export { services, appConfig };

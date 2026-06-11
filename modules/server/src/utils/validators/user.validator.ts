@@ -5,8 +5,10 @@ const userValidator = z
   .object({
     email: z.string().email(),
     password: z.string().min(6),
-    firstName: z.string().min(1),
-    lastName: z.string().min(1),
+    name: z.object({
+      firstName: z.string().min(1),
+      lastName: z.string().min(1),
+    }),
     role: z.enum(['user', 'admin']),
     phoneNumber: z.string().min(10).max(15),
     confirmPassword: z.string().min(6),
