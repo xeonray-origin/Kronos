@@ -1,12 +1,18 @@
-import { User } from '@/entities';
+import { AuthUser, User } from '@/entities';
 import { IUserDAO } from '@/interfaces';
 import { client } from './client';
-import { User as UserModel } from '@/models';
+import { User as UserModel, AuthUser as AuthUserModel } from '@/models';
 
 export default class UserDAO implements IUserDAO {
   async create(user: User): Promise<User> {
     const createdUser = await UserModel.create(user);
-    return createdUser.toObject() as unknown as User;
+    return createdUser as unknown as User;
+  }
+
+  async storePasswordHash(authUser: AuthUser): Promise<AuthUser> {
+    const created = new AuthUserModel(authUser);
+    const createAuthUser = await created.save();
+    return createAuthUser.toObject() as unknown as AuthUser;
   }
 
   async findByEmail(email: string): Promise<User | null> {

@@ -1,5 +1,6 @@
 export interface HashInterface {
-  hashPassword(password: string): Promise<{ password: string }>;
+  hashPassword(password: string): Promise<{ password: string; salt: string }>;
+  generateSalt(length?: number): Promise<string>;
 }
 
-export type HashAlgorithm = 'sha256' | 'sha512' | 'sha1' | 'md5';
+export type HashAlgorithm = 'sha256';

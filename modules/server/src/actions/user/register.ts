@@ -15,6 +15,9 @@ class RegisterUser implements IAction<User> {
   ) {}
   async call(payload: Payload): Promise<User> {
     const { isValid, errors = [], value } = this.validator.validate(payload);
+    if (!payload.email) {
+      throw new Error('missing email id');
+    }
     if (!isValid) {
       const errorMessages = Array.isArray(errors)
         ? errors
@@ -28,7 +31,10 @@ class RegisterUser implements IAction<User> {
     const { confirmPassword, ...finalPayload } = payload;
     const { password, salt } = await this.encryptPassword(finalPayload.password);
     _.assign(finalPayload, { password, salt });
-    const createdUser = await this.userDAO.create(finalPayload as AuthUser);
+    const createdUser: User = await this.userDAO.create(finalPayload as AuthUser);
+    if (createdUser._id) {
+      await this.userDAO.storePasswordHash({ _id: createdUser._id, password, salt });
+    }
     return createdUser;
   }
 }

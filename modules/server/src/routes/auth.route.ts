@@ -4,14 +4,16 @@ import AuthController from '@/controllers/auth.controller';
 import { UserDAO } from '@/dao';
 import { AuthUser, User } from '@/entities';
 import { IValidator } from '@/interfaces';
-import { userValidator } from '@/utils';
+import { Hash, userValidator } from '@/utils';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
 const userDAO = new services.auth.DAO();
 const validator = services.auth.validator as unknown as IValidator<AuthUser>;
-
-const RegisterUserAction = new RegisterUser(validator, userDAO, async (password: string) =>
-  Promise.resolve({ password, salt: '' }),
+const cryptoHash = new Hash('sha256', 8);
+const RegisterUserAction = new RegisterUser(
+  validator,
+  userDAO,
+  cryptoHash.hashPassword.bind(cryptoHash),
 );
 
 const controller = new AuthController(RegisterUserAction);
