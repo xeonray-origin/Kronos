@@ -16,4 +16,6 @@ export interface IJwtToken {
   base64UrlDecode: (payload: string) => Promise<string>;
   generateToken: (payload: JwtTokenPayload) => Promise<string>;
   verifyToken: (token: string) => Promise<JwtTokenPayload | null>;
+  generateRefreshToken: (payload: JwtTokenPayload) => Promise<string>;
+  verifyRefreshToken: (token: string) => Promise<JwtTokenPayload | null>;
 }

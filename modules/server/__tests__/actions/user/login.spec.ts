@@ -36,6 +36,8 @@ describe('LoginUser', () => {
     mockJwtToken = {
       generateToken: jest.fn(),
       verifyToken: jest.fn(),
+      generateRefreshToken: jest.fn(),
+      verifyRefreshToken: jest.fn(),
       base64UrlEncode: jest.fn(),
       base64UrlDecode: jest.fn(),
     };
