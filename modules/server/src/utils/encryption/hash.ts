@@ -1,7 +1,7 @@
-import { HashInterface, HashAlgorithm } from '@/interfaces';
+import { IHash, HashAlgorithm } from '@/interfaces';
 import { createHash, createHmac } from 'node:crypto';
 
-export class Hash implements HashInterface {
+export class Hash implements IHash {
   constructor(
     protected algorithm: HashAlgorithm,
     protected saltLength = 16,
