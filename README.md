@@ -17,6 +17,7 @@ Detailed summary of the app idea: [click here](./documentation/idea.md)
 - [Available Commands](#available-commands)
 - [Tech Stack](#tech-stack)
 - [Server Architecture](./documentation/server.md)
+- [JWT Token Logic](./documentation/jwt-token-logic.md)
 
 ## Prerequisites
 
