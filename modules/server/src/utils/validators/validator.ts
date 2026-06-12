@@ -8,7 +8,6 @@ export default class Validator<T> implements IValidator<T> {
     if (result.success) {
       return { value: result.data, isValid: true };
     }
-    console.error('Validation error:', result.error);
     return {
       isValid: false,
       errors: result.error,
