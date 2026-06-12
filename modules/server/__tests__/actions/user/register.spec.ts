@@ -15,6 +15,7 @@ describe('RegisterUser', () => {
   >;
 
   const payload = {
+    _id: new Types.ObjectId(),
     email: 'test@example.com',
     name: { firstName: 'John', lastName: 'Doe' },
     password: 'password123',
@@ -50,7 +51,7 @@ describe('RegisterUser', () => {
     mockValidator.validate.mockReturnValue({
       isValid: false,
       errors: ['email is invalid', 'password too weak'],
-      value: payload,
+      value: payload as any,
     });
     await expect(registerUser.call(payload)).rejects.toThrow(
       'Validation failed: email is invalid, password too weak',
@@ -64,7 +65,7 @@ describe('RegisterUser', () => {
       errors: {
         issues: [{ message: 'email is invalid' }, { message: 'password too weak' }],
       } as any,
-      value: payload,
+      value: payload as any,
     });
     await expect(registerUser.call(payload)).rejects.toThrow(
       'Validation failed: email is invalid, password too weak',

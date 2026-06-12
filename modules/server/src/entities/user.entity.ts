@@ -1,11 +1,11 @@
-import { ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 import Entity from './entity';
 import type { IName } from '@/interfaces';
 
 export default class User extends Entity<User> {
-  _id?: ObjectId;
-  name?: IName;
-  email?: string;
-  phoneNumber?: string;
-  role?: string;
+  _id!: Types.ObjectId;
+  name!: IName;
+  email!: string;
+  phoneNumber!: string;
+  role!: string;
 }

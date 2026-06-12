@@ -1,6 +1,6 @@
 import { AuthUser } from '@/entities';
 import { ValidationError } from '@/errors';
-import { IAction, IJwtToken, IUserDAO, IValidator } from '@/interfaces';
+import { IAction, IJwtToken, ISessionDAO, IUserDAO, IValidator } from '@/interfaces';
 
 type Payload = Pick<AuthUser, 'email' | 'password'>;
 type LoginResult = { success: boolean; token: string };
@@ -9,6 +9,7 @@ class LoginUser implements IAction<Payload, LoginResult> {
   constructor(
     protected validator: IValidator<AuthUser>,
     protected userDAO: IUserDAO,
+    protected sessionDAO: ISessionDAO,
     protected verifyPassword: (
       password: string,
       salt: string,
@@ -36,14 +37,27 @@ class LoginUser implements IAction<Payload, LoginResult> {
       throw new ValidationError('Invalid email or password');
     }
 
-    const token = await this.jwtToken.generateToken({
+    const accessToken = await this.jwtToken.generateToken({
       exp: Math.floor(Date.now() / 1000) + 3600,
       userId: user._id?.toString(),
       email: user.email,
       role: user.role,
     });
 
-    return { success: true, token };
+    const refreshToken = await this.jwtToken.generateRefreshToken({
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      userId: user._id?.toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    await this.sessionDAO.storeRefreshToken(user, {
+      refreshToken,
+      isActive: true,
+      lastActiveOn: 'Today 9th May, BLR 10:30pm IST',
+    });
+
+    return { success: true, token: accessToken };
   }
 }
 

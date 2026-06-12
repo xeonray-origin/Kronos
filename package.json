@@ -12,7 +12,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write --ignore-unknown",
     "format:check": "prettier --check .",
-    "test": "jest",
+    "test:server": "pnpm --filter @kronos/server test",
     "dev:server": "pnpm --filter @kronos/server dev",
     "dev:client": "pnpm --filter @kronos/client dev",
     "prepare": "node .husky/install.mjs",

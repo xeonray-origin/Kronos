@@ -58,4 +58,18 @@ describe('Hash', () => {
       expect(salt).toHaveLength(8);
     });
   });
+
+  describe('verifyPassword', () => {
+    it('returns true when the password matches the stored hash', async () => {
+      const { password: storedHash, salt } = await hash.hashPassword('secret');
+      const result = await hash.verifyPassword('secret', salt, storedHash);
+      expect(result).toBe(true);
+    });
+
+    it('returns false when the password does not match the stored hash', async () => {
+      const { password: storedHash, salt } = await hash.hashPassword('secret');
+      const result = await hash.verifyPassword('wrong', salt, storedHash);
+      expect(result).toBe(false);
+    });
+  });
 });

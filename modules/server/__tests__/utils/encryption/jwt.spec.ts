@@ -7,6 +7,12 @@ describe('JWTToken', () => {
     jwt = new JWTToken();
   });
 
+  describe('base64UrlDecode', () => {
+    it('adds padding when the base64url string length is not a multiple of 4', async () => {
+      expect(await jwt.base64UrlDecode('YQ')).toBe('a');
+    });
+  });
+
   describe('generateToken', () => {
     it('uses provided exp', async () => {
       const exp = Math.floor(Date.now() / 1000) + 7200;

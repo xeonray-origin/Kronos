@@ -1,6 +1,7 @@
 import { IAction, IValidationResult, IValidator, IRequest, IError } from './generic.interface';
 import { IName, IUserDAO } from './user.interface';
 import { IHash, HashAlgorithm, IJwtToken, JwtTokenPayload } from './encryption.interface';
+import { ISessionDAO } from './auth.interface';
 
 export type {
   IAction,
@@ -14,4 +15,5 @@ export type {
   HashAlgorithm,
   IJwtToken,
   JwtTokenPayload,
+  ISessionDAO,
 };

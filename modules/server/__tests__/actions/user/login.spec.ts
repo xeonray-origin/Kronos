@@ -1,6 +1,6 @@
 import LoginUser from '@/actions/user/login';
 import { AuthUser, User } from '@/entities';
-import { IJwtToken, IUserDAO, IValidator } from '@/interfaces';
+import { IJwtToken, ISessionDAO, IUserDAO, IValidator } from '@/interfaces';
 
 const makeUser = (fields: Partial<AuthUser> = {}): AuthUser =>
   Object.assign(Object.create(AuthUser.prototype), fields);
@@ -9,6 +9,7 @@ describe('LoginUser', () => {
   let loginUser: LoginUser;
   let mockValidator: jest.Mocked<IValidator<AuthUser>>;
   let mockUserDAO: jest.Mocked<IUserDAO>;
+  let mockSessionDAO: jest.Mocked<ISessionDAO>;
   let mockVerifyPassword: jest.MockedFunction<
     (password: string, salt: string, storedHash: string) => Promise<boolean>
   >;
@@ -32,6 +33,7 @@ describe('LoginUser', () => {
       update: jest.fn(),
       delete: jest.fn(),
     };
+    mockSessionDAO = { storeRefreshToken: jest.fn() };
     mockVerifyPassword = jest.fn();
     mockJwtToken = {
       generateToken: jest.fn(),
@@ -41,7 +43,13 @@ describe('LoginUser', () => {
       base64UrlEncode: jest.fn(),
       base64UrlDecode: jest.fn(),
     };
-    loginUser = new LoginUser(mockValidator, mockUserDAO, mockVerifyPassword, mockJwtToken);
+    loginUser = new LoginUser(
+      mockValidator,
+      mockUserDAO,
+      mockSessionDAO,
+      mockVerifyPassword,
+      mockJwtToken,
+    );
   });
 
   it('throws ValidationError when validation fails with array errors', async () => {
@@ -83,6 +91,8 @@ describe('LoginUser', () => {
     mockUserDAO.findAuthByEmail.mockResolvedValue(storedUser);
     mockVerifyPassword.mockResolvedValue(true);
     mockJwtToken.generateToken.mockResolvedValue('signed.jwt.token');
+    mockJwtToken.generateRefreshToken.mockResolvedValue('signed.refresh.token');
+    mockSessionDAO.storeRefreshToken.mockResolvedValue(true);
 
     const result = await loginUser.call(payload);
 
@@ -92,6 +102,11 @@ describe('LoginUser', () => {
       storedUser.password,
     );
     expect(mockJwtToken.generateToken).toHaveBeenCalled();
+    expect(mockJwtToken.generateRefreshToken).toHaveBeenCalled();
+    expect(mockSessionDAO.storeRefreshToken).toHaveBeenCalledWith(
+      storedUser,
+      expect.objectContaining({ refreshToken: 'signed.refresh.token', isActive: true }),
+    );
     expect(result).toEqual({ success: true, token: 'signed.jwt.token' });
   });
 });
