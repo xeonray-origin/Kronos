@@ -20,6 +20,14 @@ export default class UserDAO implements IUserDAO {
     return user ? (user.toObject() as unknown as User) : null;
   }
 
+  async findAuthByEmail(email: string): Promise<AuthUser | null> {
+    const user = await UserModel.findOne({ email });
+    if (!user) return null;
+    const auth = await AuthUserModel.findById(user._id);
+    if (!auth) return null;
+    return { ...user.toObject(), ...auth.toObject() } as unknown as AuthUser;
+  }
+
   async findById(id: number): Promise<User | null> {
     const user = await UserModel.findById(id);
     return user ? (user.toObject() as unknown as User) : null;

@@ -1,5 +1,5 @@
 import { IJwtToken } from '@/interfaces';
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 export class JWTToken implements IJwtToken {
   secretKey: string;
@@ -34,9 +34,10 @@ export class JWTToken implements IJwtToken {
     const encodedPayload = await this.base64UrlEncode(JSON.stringify(tokenPayload));
 
     const signatureInput = `${encodedHeader}.${encodedPayload}`;
-    const signature = crypto.createHmac('sha256', this.secretKey).update(signatureInput).digest();
-
-    const encodedSignature = await this.base64UrlEncode(signature);
+    const encodedSignature = crypto
+      .createHmac('sha256', this.secretKey)
+      .update(signatureInput)
+      .digest('base64url');
 
     return `${encodedHeader}.${encodedPayload}.${encodedSignature}`;
   }
@@ -48,12 +49,10 @@ export class JWTToken implements IJwtToken {
     const [encodedHeader, encodedPayload, encodedSignature] = parts as [string, string, string];
 
     const signatureInput = `${encodedHeader}.${encodedPayload}`;
-    const expectedSignature = crypto
+    const encodedExpectedSignature = crypto
       .createHmac('sha256', this.secretKey)
       .update(signatureInput)
-      .digest();
-
-    const encodedExpectedSignature = await this.base64UrlEncode(expectedSignature);
+      .digest('base64url');
 
     const isSignatureValid = crypto.timingSafeEqual(
       Buffer.from(encodedSignature),

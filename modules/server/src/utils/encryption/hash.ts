@@ -14,6 +14,16 @@ export class Hash implements IHash {
     return generatedSalt;
   }
 
+  public async verifyPassword(
+    password: string,
+    salt: string,
+    storedHash: string,
+  ): Promise<boolean> {
+    const hash = createHmac(this.algorithm, salt);
+    hash.update(password);
+    return hash.digest('hex') === storedHash;
+  }
+
   public async hashPassword(password: string): Promise<{ password: string; salt: string }> {
     const salt = await this.generateSalt(this.saltLength);
     const hash = createHmac(this.algorithm, salt);

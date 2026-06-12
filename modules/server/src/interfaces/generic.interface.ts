@@ -17,8 +17,8 @@ export interface IValidator<T> {
   validate(input: Partial<T>): IValidationResult<T>;
 }
 
-export interface IAction<T> {
-  call(...args: unknown[]): T | Promise<T>;
+export interface IAction<TInput, TOutput = TInput> {
+  call(...args: unknown[]): TOutput | Promise<TOutput>;
 }
 
 export interface IRequest {
