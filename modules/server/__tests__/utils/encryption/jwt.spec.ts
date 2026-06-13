@@ -1,4 +1,4 @@
-import { JWTToken } from '@/utils/encryption/jwt';
+import { JWTToken } from '@/utils';
 
 describe('JWTToken', () => {
   let jwt: JWTToken;

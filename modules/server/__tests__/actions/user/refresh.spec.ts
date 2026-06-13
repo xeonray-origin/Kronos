@@ -1,10 +1,13 @@
 import RefreshToken from '@/actions/user/refresh';
-import { AuthUser } from '@/entities';
+import { AuthUser, SessionPayload } from '@/entities';
 import { IJwtToken, ISessionDAO, IUserDAO } from '@/interfaces';
 import { Types } from 'mongoose';
 
 const makeUser = (fields: Partial<AuthUser> = {}): AuthUser =>
   Object.assign(Object.create(AuthUser.prototype), fields);
+
+const makeSessionPayload = (fields: Partial<SessionPayload> = {}): SessionPayload =>
+  Object.assign(Object.create(SessionPayload.prototype), fields);
 
 describe('RefreshToken', () => {
   let refreshToken: RefreshToken;
@@ -13,7 +16,7 @@ describe('RefreshToken', () => {
   let mockJwtToken: jest.Mocked<IJwtToken>;
 
   const userId = new Types.ObjectId();
-  const payload = { refreshToken: 'old.refresh.token' };
+  const payload = makeSessionPayload({ refreshToken: 'old.refresh.token' });
   const decodedPayload = {
     exp: 9999999999,
     userId: userId.toString(),
