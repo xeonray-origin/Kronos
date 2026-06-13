@@ -10,11 +10,14 @@ export default class SessionDAO implements ISessionDAO {
     const payload = {
       _id: user._id,
       refreshToken: sessionInfo.refreshToken,
-      isActive: sessionInfo.isActive,
-      lastActiveOn: sessionInfo.lastActiveOn,
     };
     const options = { upsert: true };
     await SessionModel.findOneAndUpdate(filter, payload, options);
     return true;
+  }
+
+  async invalidatePreviousToken(sessionInfo: SessionInfo) {
+    const filter = { _id: sessionInfo._id };
+    await SessionModel.findOneAndDelete(filter);
   }
 }

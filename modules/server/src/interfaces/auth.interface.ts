@@ -1,12 +1,12 @@
 import { User } from '@/entities';
-import { Schema } from 'mongoose';
+import { Schema, Types } from 'mongoose';
 
 export type SessionInfo = {
-  refreshToken: string;
-  isActive: boolean;
-  lastActiveOn: string;
+  _id?: Types.ObjectId;
+  refreshToken?: string;
 };
 
 export interface ISessionDAO {
   storeRefreshToken(user: Pick<User, '_id'>, sessionInfo: SessionInfo): Promise<boolean>;
+  invalidatePreviousToken(sessionInfo: SessionInfo): Promise<void>;
 }

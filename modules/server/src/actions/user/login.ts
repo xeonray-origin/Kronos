@@ -3,7 +3,7 @@ import { ValidationError } from '@/errors';
 import { IAction, IJwtToken, ISessionDAO, IUserDAO, IValidator } from '@/interfaces';
 
 type Payload = Pick<AuthUser, 'email' | 'password'>;
-type LoginResult = { success: boolean; token: string };
+type LoginResult = { success: boolean; token: string; refreshToken: string };
 
 class LoginUser implements IAction<Payload, LoginResult> {
   constructor(
@@ -38,6 +38,7 @@ class LoginUser implements IAction<Payload, LoginResult> {
     }
 
     const accessToken = await this.jwtToken.generateToken({
+      //access token valid for 1hr
       exp: Math.floor(Date.now() / 1000) + 3600,
       userId: user._id?.toString(),
       email: user.email,
@@ -45,7 +46,8 @@ class LoginUser implements IAction<Payload, LoginResult> {
     });
 
     const refreshToken = await this.jwtToken.generateRefreshToken({
-      exp: Math.floor(Date.now() / 1000) + 3600,
+      // refresh token valid for a week
+      exp: Math.floor(Date.now() / 1000) + 604800,
       userId: user._id?.toString(),
       email: user.email,
       role: user.role,
@@ -53,11 +55,9 @@ class LoginUser implements IAction<Payload, LoginResult> {
 
     await this.sessionDAO.storeRefreshToken(user, {
       refreshToken,
-      isActive: true,
-      lastActiveOn: 'Today 9th May, BLR 10:30pm IST',
     });
 
-    return { success: true, token: accessToken };
+    return { success: true, token: accessToken, refreshToken };
   }
 }
 

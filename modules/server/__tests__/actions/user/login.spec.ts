@@ -33,7 +33,7 @@ describe('LoginUser', () => {
       update: jest.fn(),
       delete: jest.fn(),
     };
-    mockSessionDAO = { storeRefreshToken: jest.fn() };
+    mockSessionDAO = { storeRefreshToken: jest.fn(), invalidatePreviousToken: jest.fn() };
     mockVerifyPassword = jest.fn();
     mockJwtToken = {
       generateToken: jest.fn(),
@@ -103,10 +103,13 @@ describe('LoginUser', () => {
     );
     expect(mockJwtToken.generateToken).toHaveBeenCalled();
     expect(mockJwtToken.generateRefreshToken).toHaveBeenCalled();
-    expect(mockSessionDAO.storeRefreshToken).toHaveBeenCalledWith(
-      storedUser,
-      expect.objectContaining({ refreshToken: 'signed.refresh.token', isActive: true }),
-    );
-    expect(result).toEqual({ success: true, token: 'signed.jwt.token' });
+    expect(mockSessionDAO.storeRefreshToken).toHaveBeenCalledWith(storedUser, {
+      refreshToken: 'signed.refresh.token',
+    });
+    expect(result).toEqual({
+      success: true,
+      token: 'signed.jwt.token',
+      refreshToken: 'signed.refresh.token',
+    });
   });
 });

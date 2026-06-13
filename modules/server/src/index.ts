@@ -3,6 +3,7 @@ import cors from 'cors';
 import routes from '@/routes';
 import methodOverride from 'method-override';
 import { IError } from '@/interfaces';
+import { default as cookieParser } from 'cookie-parser';
 
 const app: Express = express();
 const port = process.env['PORT'] ?? 8080;
@@ -10,6 +11,7 @@ const port = process.env['PORT'] ?? 8080;
 const METHODS_ALLOWED = 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS';
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   cors({
     origin: '*',
@@ -23,7 +25,6 @@ app.get('/health-check', (_req, res) => {
 });
 
 routes.attach(app);
-
 app.use(methodOverride());
 
 // app.use('*', (req: express.Request, res: express.Response) => {
