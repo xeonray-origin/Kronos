@@ -13,6 +13,7 @@ export default class AuthController {
       SessionInfo,
       { success: boolean; token: string; refreshToken: string }
     >,
+    protected logoutUser: IAction<Pick<AuthUser, '_id'>, { success: boolean }>,
   ) {}
 
   async register(request: IRequest): Promise<User> {
@@ -54,5 +55,16 @@ export default class AuthController {
     });
     const responsePayload = _.omit(result, ['refreshToken']);
     return _.update(responsePayload, 'token', (token: string) => `Bearer-${token}`);
+  }
+
+  async logout(
+    request: IRequest,
+    response: Response,
+  ): Promise<{
+    success: boolean;
+  }> {
+    const { body: payload } = request;
+    response.cookie('refreshToken', '');
+    return this.logoutUser.call(payload);
   }
 }

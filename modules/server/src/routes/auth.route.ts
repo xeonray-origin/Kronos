@@ -1,4 +1,4 @@
-import { RegisterUser, LoginUser, RefreshToken } from '@/actions';
+import { RegisterUser, LoginUser, RefreshToken, LogoutUser } from '@/actions';
 import { services } from '@/config';
 import AuthController from '@/controllers/auth.controller';
 import SessionDAO from '@/dao/session.dao';
@@ -30,7 +30,14 @@ const LoginUserAction = new LoginUser(
   jwtToken,
 );
 
-const controller = new AuthController(RegisterUserAction, LoginUserAction, RefreshTokenAction);
+const LogoutUserAction = new LogoutUser(sessionDAO, jwtToken);
+
+const controller = new AuthController(
+  RegisterUserAction,
+  LoginUserAction,
+  RefreshTokenAction,
+  LogoutUserAction,
+);
 const router: Router = express.Router();
 
 router.post('/register', async (request: Request, response: Response, next: NextFunction) => {
@@ -58,6 +65,16 @@ router.get('/refresh', async (request: Request, response: Response, next: NextFu
     console.log(request.cookies);
     const { refreshToken } = request.cookies;
     const result = await controller.refresh({ body: { refreshToken } }, response);
+    response.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/logout', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { refreshToken } = request.cookies;
+    const result = await controller.logout({ body: { refreshToken } }, response);
     response.status(200).json(result);
   } catch (err) {
     next(err);

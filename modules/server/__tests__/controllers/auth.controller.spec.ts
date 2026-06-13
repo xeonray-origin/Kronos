@@ -14,12 +14,19 @@ describe('AuthController', () => {
   let mockRegisterUser: jest.Mocked<IAction<User>>;
   let mockLoginUser: jest.Mocked<IAction<Pick<AuthUser, 'email' | 'password'>, ILoginOutput>>;
   let mockRefreshToken: jest.Mocked<IAction<SessionInfo, ILoginOutput>>;
+  let mockLogoutUser: jest.Mocked<IAction<Pick<AuthUser, '_id'>, { success: boolean }>>;
 
   beforeEach(() => {
     mockRegisterUser = { call: jest.fn() };
     mockLoginUser = { call: jest.fn() };
     mockRefreshToken = { call: jest.fn() };
-    controller = new AuthController(mockRegisterUser, mockLoginUser, mockRefreshToken);
+    mockLogoutUser = { call: jest.fn() };
+    controller = new AuthController(
+      mockRegisterUser,
+      mockLoginUser,
+      mockRefreshToken,
+      mockLogoutUser,
+    );
   });
 
   describe('register', () => {
@@ -96,6 +103,29 @@ describe('AuthController', () => {
 
       expect(result).toEqual({ success: true, token: 'Bearer-new.access.token' });
       expect(result).not.toHaveProperty('refreshToken');
+    });
+  });
+
+  describe('logout', () => {
+    const body = { refreshToken: 'some.refresh.token' };
+
+    it('clears the refreshToken cookie', async () => {
+      const response = makeResponse() as unknown as Response;
+      mockLogoutUser.call.mockResolvedValue({ success: true });
+
+      await controller.logout({ body }, response);
+
+      expect(response.cookie).toHaveBeenCalledWith('refreshToken', '');
+    });
+
+    it('returns success from the logoutUser action', async () => {
+      const response = makeResponse() as unknown as Response;
+      mockLogoutUser.call.mockResolvedValue({ success: true });
+
+      const result = await controller.logout({ body }, response);
+
+      expect(mockLogoutUser.call).toHaveBeenCalledWith(body);
+      expect(result).toEqual({ success: true });
     });
   });
 });
