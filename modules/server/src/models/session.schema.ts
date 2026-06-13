@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { client } from '@/dao/client';
+import client from './client';
 const sessionSchema = new Schema(
   {
     _id: {

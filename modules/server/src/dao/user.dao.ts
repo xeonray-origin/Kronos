@@ -1,9 +1,8 @@
 import { AuthUser, User } from '@/entities';
 import { IUserDAO } from '@/interfaces';
-import { client } from './client';
 import { User as UserModel, AuthUser as AuthUserModel } from '@/models';
 
-export default class UserDAO implements IUserDAO {
+export class UserDAO implements IUserDAO {
   async create(user: User): Promise<User> {
     const createdUser = await UserModel.create(user);
     return createdUser as unknown as User;
@@ -34,13 +33,11 @@ export default class UserDAO implements IUserDAO {
   }
 
   async update(id: number, user: Partial<User>): Promise<User> {
-    const UserModel = client.model('User');
     const updatedUser = await UserModel.findByIdAndUpdate(id, user, { new: true });
     return updatedUser ? (updatedUser.toObject() as unknown as User) : ({} as User);
   }
 
   async delete(id: number): Promise<void> {
-    const UserModel = client.model('User');
     await UserModel.findByIdAndDelete(id);
   }
 }

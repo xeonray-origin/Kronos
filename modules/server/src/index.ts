@@ -34,13 +34,15 @@ app.use(methodOverride());
 //   });
 // });
 
-app.use((err: IError, _req: express.Request, res: express.Response) => {
-  console.error(err);
-  res.status(err.httpStatusCode || 500).send({
-    error: err.message,
-    details: err?.details,
-  });
-});
+app.use(
+  (err: IError, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error(err);
+    res.status(err.httpStatusCode || 500).send({
+      error: err.message,
+      details: err?.details,
+    });
+  },
+);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

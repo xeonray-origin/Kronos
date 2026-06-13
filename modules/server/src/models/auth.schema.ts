@@ -1,5 +1,6 @@
 import { Schema } from 'mongoose';
-import { client } from '@/dao/client';
+import client from './client';
+
 const authSchema = new Schema(
   {
     _id: {

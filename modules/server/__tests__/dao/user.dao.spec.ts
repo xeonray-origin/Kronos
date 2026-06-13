@@ -1,7 +1,6 @@
 import { Types } from 'mongoose';
-import UserDAO from '../../src/dao/user.dao';
+import { UserDAO } from '@/dao/user.dao';
 import { User as UserModel, AuthUser as AuthUserModel } from '@/models';
-import { client } from '@/dao/client';
 
 jest.mock('@/models', () => {
   const MockAuthUser = jest.fn();
@@ -11,21 +10,20 @@ jest.mock('@/models', () => {
       create: jest.fn(),
       findOne: jest.fn(),
       findById: jest.fn(),
+      findByIdAndUpdate: jest.fn(),
+      findByIdAndDelete: jest.fn(),
     },
     AuthUser: MockAuthUser,
   };
 });
 
-jest.mock('@/dao/client', () => ({
-  client: { model: jest.fn() },
-}));
-
 const mockCreate = UserModel.create as jest.Mock;
 const mockFindOne = UserModel.findOne as jest.Mock;
 const mockUserFindById = UserModel.findById as jest.Mock;
+const mockFindByIdAndUpdate = UserModel.findByIdAndUpdate as jest.Mock;
+const mockFindByIdAndDelete = UserModel.findByIdAndDelete as jest.Mock;
 const mockAuthUserClass = AuthUserModel as unknown as jest.Mock;
 const mockAuthUserFindById = (AuthUserModel as any).findById as jest.Mock;
-const mockClientModel = client.model as jest.Mock;
 
 describe('UserDAO', () => {
   let dao: UserDAO;
@@ -141,12 +139,10 @@ describe('UserDAO', () => {
 
   describe('update', () => {
     it('returns the updated user when found', async () => {
-      const mockFindByIdAndUpdate = jest.fn().mockResolvedValueOnce(userDoc);
-      mockClientModel.mockReturnValueOnce({ findByIdAndUpdate: mockFindByIdAndUpdate });
+      mockFindByIdAndUpdate.mockResolvedValueOnce(userDoc);
 
       const result = await dao.update(1, { email: 'new@example.com' } as any);
 
-      expect(mockClientModel).toHaveBeenCalledWith('User');
       expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
         1,
         { email: 'new@example.com' },
@@ -156,8 +152,7 @@ describe('UserDAO', () => {
     });
 
     it('returns an empty object when the user is not found', async () => {
-      const mockFindByIdAndUpdate = jest.fn().mockResolvedValueOnce(null);
-      mockClientModel.mockReturnValueOnce({ findByIdAndUpdate: mockFindByIdAndUpdate });
+      mockFindByIdAndUpdate.mockResolvedValueOnce(null);
 
       const result = await dao.update(1, {});
 
@@ -167,12 +162,10 @@ describe('UserDAO', () => {
 
   describe('delete', () => {
     it('calls findByIdAndDelete with the given id', async () => {
-      const mockFindByIdAndDelete = jest.fn().mockResolvedValueOnce(null);
-      mockClientModel.mockReturnValueOnce({ findByIdAndDelete: mockFindByIdAndDelete });
+      mockFindByIdAndDelete.mockResolvedValueOnce(null);
 
       await dao.delete(1);
 
-      expect(mockClientModel).toHaveBeenCalledWith('User');
       expect(mockFindByIdAndDelete).toHaveBeenCalledWith(1);
     });
   });

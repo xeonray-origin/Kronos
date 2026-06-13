@@ -1,3 +1,4 @@
-import UserDAO from './user.dao';
-import { client } from './client';
-export { UserDAO, client };
+import { UserDAO } from './user.dao';
+import { TaskDAO } from './task.dao';
+
+export { UserDAO, TaskDAO };

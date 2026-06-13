@@ -2,6 +2,7 @@ import { IAction, IValidationResult, IValidator, IRequest, IError } from './gene
 import { IName, IUserDAO } from './user.interface';
 import { IHash, HashAlgorithm, IJwtToken, JwtTokenPayload } from './encryption.interface';
 import { ISessionDAO, SessionInfo } from './auth.interface';
+import { ITaskDAO } from './task.interface';
 
 export type {
   IAction,
@@ -17,4 +18,5 @@ export type {
   JwtTokenPayload,
   ISessionDAO,
   SessionInfo,
+  ITaskDAO,
 };
