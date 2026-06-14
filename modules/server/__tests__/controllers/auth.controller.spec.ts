@@ -3,7 +3,12 @@ import { IAction, IRequest, SessionInfo } from '@/interfaces';
 import { User, AuthUser } from '@/entities';
 import { Response } from 'express';
 
-type ILoginOutput = { success: boolean; token: string; refreshToken: string };
+type ILoginOutput = {
+  success: boolean;
+  token: string;
+  refreshToken: string;
+  maxCookieAge?: number;
+};
 
 const makeResponse = (): jest.Mocked<Pick<Response, 'cookie'>> => ({
   cookie: jest.fn(),
@@ -80,6 +85,7 @@ describe('AuthController', () => {
       success: true,
       token: 'new.access.token',
       refreshToken: 'new.refresh.token',
+      maxCookieAge: 9999999,
     };
 
     it('sets an httpOnly cookie with the new refresh token', async () => {
@@ -92,6 +98,7 @@ describe('AuthController', () => {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
+        maxAge: refreshOutput.maxCookieAge,
       });
     });
 
@@ -101,7 +108,11 @@ describe('AuthController', () => {
 
       const result = await controller.refresh({ body }, response);
 
-      expect(result).toEqual({ success: true, token: 'Bearer-new.access.token' });
+      expect(result).toEqual({
+        success: true,
+        token: 'Bearer-new.access.token',
+        maxCookieAge: refreshOutput.maxCookieAge,
+      });
       expect(result).not.toHaveProperty('refreshToken');
     });
   });
@@ -115,7 +126,12 @@ describe('AuthController', () => {
 
       await controller.logout({ body }, response);
 
-      expect(response.cookie).toHaveBeenCalledWith('refreshToken', '');
+      expect(response.cookie).toHaveBeenCalledWith('refreshToken', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 0,
+      });
     });
 
     it('returns success from the logoutUser action', async () => {

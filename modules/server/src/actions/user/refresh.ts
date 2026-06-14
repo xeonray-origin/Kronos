@@ -3,7 +3,13 @@ import { ValidationError } from '@/errors';
 import { IAction, IJwtToken, ISessionDAO, IUserDAO, IValidator } from '@/interfaces';
 import { Types } from 'mongoose';
 
-type LoginResult = { _id: Types.ObjectId; success: boolean; token: string; refreshToken: string };
+type LoginResult = {
+  _id: Types.ObjectId;
+  success: boolean;
+  token: string;
+  refreshToken: string;
+  maxCookieAge: number;
+};
 
 class RefreshToken implements IAction<SessionPayload, LoginResult> {
   constructor(
@@ -46,6 +52,7 @@ class RefreshToken implements IAction<SessionPayload, LoginResult> {
       success: true,
       token: accessToken,
       refreshToken: generatedRefreshToken,
+      maxCookieAge: Math.floor(Date.now() / 1000) + 604800,
     };
   }
 }

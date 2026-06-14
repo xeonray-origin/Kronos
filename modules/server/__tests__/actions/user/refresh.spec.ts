@@ -79,6 +79,7 @@ describe('RefreshToken', () => {
       success: true,
       token: 'new.access.token',
       refreshToken: 'new.refresh.token',
+      maxCookieAge: expect.any(Number),
     });
   });
 });

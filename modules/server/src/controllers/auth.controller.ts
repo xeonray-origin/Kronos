@@ -11,7 +11,12 @@ export default class AuthController {
     >,
     protected refreshToken: IAction<
       SessionInfo,
-      { success: boolean; token: string; refreshToken: string }
+      {
+        maxCookieAge?: number;
+        success: boolean;
+        token: string;
+        refreshToken: string;
+      }
     >,
     protected logoutUser: IAction<Pick<AuthUser, '_id'>, { success: boolean }>,
   ) {}
@@ -52,6 +57,7 @@ export default class AuthController {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
+      maxAge: result.maxCookieAge,
     });
     const responsePayload = _.omit(result, ['refreshToken']);
     return _.update(responsePayload, 'token', (token: string) => `Bearer-${token}`);
@@ -64,7 +70,12 @@ export default class AuthController {
     success: boolean;
   }> {
     const { body: payload } = request;
-    response.cookie('refreshToken', '');
+    response.cookie('refreshToken', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 0,
+    });
     return this.logoutUser.call(payload);
   }
 }

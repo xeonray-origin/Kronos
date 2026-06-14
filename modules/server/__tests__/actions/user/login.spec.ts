@@ -110,6 +110,7 @@ describe('LoginUser', () => {
       success: true,
       token: 'signed.jwt.token',
       refreshToken: 'signed.refresh.token',
+      maxCookieAge: expect.any(Number),
     });
   });
 });

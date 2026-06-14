@@ -3,7 +3,7 @@ import { ValidationError } from '@/errors';
 import { IAction, IJwtToken, ISessionDAO, IUserDAO, IValidator } from '@/interfaces';
 
 type Payload = Pick<AuthUser, 'email' | 'password'>;
-type LoginResult = { success: boolean; token: string; refreshToken: string };
+type LoginResult = { success: boolean; token: string; refreshToken: string; maxCookieAge: number };
 
 class LoginUser implements IAction<Payload, LoginResult> {
   constructor(
@@ -57,7 +57,12 @@ class LoginUser implements IAction<Payload, LoginResult> {
       refreshToken,
     });
 
-    return { success: true, token: accessToken, refreshToken };
+    return {
+      success: true,
+      token: accessToken,
+      refreshToken,
+      maxCookieAge: Math.floor(Date.now() / 1000) + 604800,
+    };
   }
 }
 
