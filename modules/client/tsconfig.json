@@ -15,6 +15,6 @@
     "composite": true,
     "tsBuildInfoFile": ".tsbuildinfo"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../tailwind.config.js"],
   "exclude": ["node_modules", "dist"]
 }
