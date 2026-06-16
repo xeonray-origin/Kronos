@@ -24,9 +24,12 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.3.1",
     "class-variance-authority": "^0.7.1",
+    "date-fns": "^4.4.0",
     "lucide-react": "^1.18.0",
     "postcss-loader": "^8.2.1",
+    "radix-ui": "^1.6.0",
     "react": "^19.2.7",
+    "react-day-picker": "^10.0.1",
     "react-dom": "^19.2.7",
     "shadcn": "^4.11.0",
     "tailwindcss": "^4.3.1",

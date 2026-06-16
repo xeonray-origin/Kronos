@@ -28,3 +28,8 @@ Thumbs.db
 .nyc_output/
 .eslintcache
 CLAUDE.md
+
+
+#Exceptions
+!global.d.ts
+!css.d.ts
