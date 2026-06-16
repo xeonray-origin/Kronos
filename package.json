@@ -12,6 +12,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write --ignore-unknown",
     "format:check": "prettier --check .",
+    "test:client": "pnpm --filter @kronos/server test",
     "test:server": "pnpm --filter @kronos/server test",
     "dev:server": "pnpm --filter @kronos/server dev",
     "dev:client": "pnpm --filter @kronos/client dev",
