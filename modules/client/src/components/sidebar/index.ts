@@ -1,2 +1,1 @@
-export { Task } from './task';
 export { Sidebar } from './sidebar';
