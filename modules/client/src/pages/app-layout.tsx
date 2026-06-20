@@ -123,7 +123,7 @@ export default function AppLayout() {
   const [currentView, setCurrentView] = useState<'board' | 'list'>('board');
 
   return (
-    <div className="dark h-dvh bg-background overflow-y-hidden">
+    <div className="h-dvh bg-background overflow-y-hidden">
       <Topbar currentView={currentView} onViewChange={setCurrentView} />
       <main className="flex h-[calc(100dvh-4rem)] w-full pt-16">
         <div className="flex-none  h-dvh">

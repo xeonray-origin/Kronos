@@ -1,7 +1,11 @@
 import React from 'react';
 import './global.css';
-import { AppLayout } from './pages';
+import { AppLayout, LoginPage } from './pages';
 
 export default function App() {
-  return <AppLayout />;
+  return (
+    <div className="dark">
+      <LoginPage />
+    </div>
+  );
 }
