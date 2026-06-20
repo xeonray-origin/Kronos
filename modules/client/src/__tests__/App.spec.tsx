@@ -1,10 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import App from '@/App';
 
-jest.mock('@/pages', () => ({
+jest.mock('react-router', () => ({
+  Routes: () => null,
+  Route: () => null,
+}));
+
+jest.mock('@/layouts', () => ({
   SignupPage: () => <div data-testid="signup-page" />,
   LoginPage: () => <div data-testid="login-page" />,
   AppLayout: () => <div data-testid="app-layout" />,
+  AuthLayout: () => <div data-testid="auth-layout" />,
 }));
 
 jest.mock('@/components', () => ({
@@ -13,17 +19,14 @@ jest.mock('@/components', () => ({
       toggle
     </button>
   ),
+  LoginForm: () => <div data-testid="login-form" />,
+  SignupForm: () => <div data-testid="signup-form" />,
 }));
 
 describe('App', () => {
   it('renders in dark mode by default', () => {
     const { container } = render(<App />);
     expect(container.firstChild).toHaveClass('dark');
-  });
-
-  it('renders the signup page', () => {
-    render(<App />);
-    expect(screen.getByTestId('signup-page')).toBeInTheDocument();
   });
 
   it('renders the topbar', () => {

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import AppLayout from '@/pages/app-layout';
+import AppLayout from '@/layouts/app';
 
 describe('AppLayout', () => {
   it('renders the sidebar', () => {

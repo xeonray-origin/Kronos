@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import './global.css';
-import { AppLayout, LoginPage, SignupPage } from './pages';
 import { Topbar } from '@/components';
+import { useState } from 'react';
+import { Route, Routes } from 'react-router';
+import './global.css';
+import { AppLayout, AuthLayout } from './layouts';
 import { cn } from './lib/utils';
 
 export default function App() {
@@ -11,7 +12,10 @@ export default function App() {
     <div className={cn(isDark ? 'dark' : 'light')}>
       <div className="h-dvh bg-background overflow-y-hidden">
         <Topbar onToggleTheme={setDarkMode} isDark={isDark} />
-        <SignupPage />
+        <Routes>
+          <Route path="/" element={<AuthLayout />} />
+          <Route path="/dashboard" element={<AppLayout />}></Route>
+        </Routes>
       </div>
     </div>
   );
