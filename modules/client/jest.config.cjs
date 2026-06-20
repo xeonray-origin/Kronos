@@ -18,6 +18,7 @@ const config = {
     ],
   },
   moduleNameMapper: {
+    '\\.css$': '<rootDir>/src/__mocks__/styleMock.js',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
