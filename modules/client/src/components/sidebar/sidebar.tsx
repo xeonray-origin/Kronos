@@ -87,7 +87,10 @@ function NavItem({ icon: Icon, label, count, active }: NavLink) {
 
 function ProjectItem({ name, emoji, shared, count }: Project) {
   return (
-    <button className="flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium text-sidebar-foreground/90 transition-colors hover:bg-sidebar-accent">
+    <button
+      className="flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium 
+    text-sidebar-foreground/90 transition-colors hover:bg-sidebar-accent"
+    >
       <Hash className="size-[18px] shrink-0 text-emerald-500" />
       <span className="flex items-center gap-1.5 truncate text-left">
         {name}
@@ -106,9 +109,15 @@ export function Sidebar({
   projects = defaultProjects,
 }: SidebarProps) {
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 flex w-[280px] flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+    <aside
+      className="relative  h-dvh inset-y-0 left-0 z-40 flex w-70 flex-col 
+    border-r border-sidebar-border bg-sidebar text-sidebar-foreground"
+    >
       <div className="flex items-center justify-between gap-1 px-3 pt-3 pb-1">
-        <button className="flex min-w-0 items-center gap-2 rounded-md px-1.5 py-1 transition-colors hover:bg-sidebar-accent">
+        <button
+          className="flex min-w-0 items-center gap-2 rounded-md px-1.5 py-1 
+        transition-colors hover:bg-sidebar-accent"
+        >
           <Avatar>
             {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
@@ -139,16 +148,6 @@ export function Sidebar({
           <ProjectItem key={project.name} {...project} />
         ))}
       </div>
-
-      <div className="flex-1" />
-
-      <button
-        className="flex items-center gap-3 border-t border-sidebar-border px-5 py-3 text-sm font-medium 
-      text-sidebar-foreground/90 transition-colors hover:bg-sidebar-accent"
-      >
-        <CircleHelp className="size-[18px] text-muted-foreground" />
-        Help & resources
-      </button>
     </aside>
   );
 }

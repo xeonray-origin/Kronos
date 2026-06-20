@@ -18,7 +18,6 @@ describe('Sidebar', () => {
 
     expect(screen.getByRole('button', { name: 'Notifications' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Toggle sidebar' })).toBeInTheDocument();
-    expect(screen.getByText('Help & resources')).toBeInTheDocument();
   });
 
   it('renders provided user, links, and projects', () => {

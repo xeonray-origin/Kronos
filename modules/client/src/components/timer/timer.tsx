@@ -41,7 +41,10 @@ export function Timer({ initialMinutes = 25, label = 'FOCUS' }: TimerProps) {
 
   return (
     <div className={cn('flex flex-col items-center gap-6')}>
-      <div className="flex size-48 flex-col items-center justify-center gap-1 rounded-full border-[8px] border-destructive">
+      <div
+        className="flex size-48 flex-col items-center justify-center gap-1 
+      rounded-full border-[8px] border-destructive"
+      >
         <span className="tabular-nums text-4xl font-bold text-foreground">
           {formatTime(timeLeft)}
         </span>

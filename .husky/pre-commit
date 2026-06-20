@@ -3,3 +3,4 @@ pnpm typecheck
 pnpm run format
 git update-index --again
 pnpm test:server
+pnpm test:client
