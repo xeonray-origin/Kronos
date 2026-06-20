@@ -23,15 +23,12 @@ export function Topbar({
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background">
       <div className="flex h-16 items-center justify-between gap-4 px-6">
-        {/* Logo Section */}
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand/10">
             <span className="text-sm font-bold text-brand">{appName.charAt(0).toUpperCase()}</span>
           </div>
           <span className="text-lg font-bold text-foreground">{appName}</span>
         </div>
-
-        {/* Search/Add Task Section */}
         <div className="flex-1 max-w-md">
           <Input
             type="text"
@@ -41,8 +38,6 @@ export function Topbar({
             onClick={onAddTask}
           />
         </div>
-
-        {/* Controls Section */}
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={handleToggleTheme} aria-label="Refresh">
             <Sun className="size-4" />

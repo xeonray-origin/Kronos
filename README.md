@@ -16,8 +16,9 @@ Detailed summary of the app idea: [click here](./documentation/idea.md)
 - [Getting Started](#getting-started)
 - [Available Commands](#available-commands)
 - [Tech Stack](#tech-stack)
-- [Server Architecture](./documentation/server.md)
 - [JWT Token Logic](./documentation/jwt-token-logic.md)
+- [Server Architecture](./documentation/server.md)
+- [Frontend Architecture](./documentation/frontend.md)
 
 ## Prerequisites
 
