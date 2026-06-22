@@ -7,8 +7,9 @@ describe('Sidebar', () => {
     render(<Sidebar />);
 
     expect(screen.getByText('Xeonray')).toBeInTheDocument();
-    expect(screen.getByText('Search')).toBeInTheDocument();
+    expect(screen.getByText('Inbox')).toBeInTheDocument();
     expect(screen.getByText('Today')).toBeInTheDocument();
+    expect(screen.getByText('Analyze')).toBeInTheDocument();
     expect(screen.getByText('8')).toBeInTheDocument();
 
     expect(screen.getByText('My Projects')).toBeInTheDocument();

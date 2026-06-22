@@ -51,12 +51,10 @@ interface SidebarProps {
 }
 
 const defaultLinks: NavLink[] = [
-  { icon: Search, label: 'Search' },
   { icon: Inbox, label: 'Inbox', count: 8 },
   { icon: CalendarDays, label: 'Today', count: 2, active: true },
   { icon: CalendarDays, label: 'Upcoming' },
-  { icon: ChartNoAxesCombined, label: 'Reporting' },
-  { icon: Ellipsis, label: 'More' },
+  { icon: ChartNoAxesCombined, label: 'Analyze' },
 ];
 
 const defaultProjects: Project[] = [
