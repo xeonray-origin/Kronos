@@ -20,3 +20,13 @@ export {
   CardContent,
 } from './card';
 export { Checkbox } from './checkbox';
+export {
+  Dialog,
+  DialogOverlay,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from './dialog';

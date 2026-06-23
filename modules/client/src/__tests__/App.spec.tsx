@@ -21,6 +21,7 @@ jest.mock('@/components', () => ({
   ),
   LoginForm: () => <div data-testid="login-form" />,
   SignupForm: () => <div data-testid="signup-form" />,
+  CreateTaskModal: () => null,
 }));
 
 describe('App', () => {

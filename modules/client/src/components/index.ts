@@ -1,4 +1,5 @@
 export { Task } from './task';
+export { CreateTaskModal } from './create-task-modal/create-task-modal';
 export { LoginForm } from './login-form/login-form';
 export { SignupForm } from './signup-form/signup-form';
 export { Sidebar } from './sidebar';

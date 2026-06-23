@@ -22,22 +22,16 @@ describe('Topbar', () => {
       expect(screen.getByText('MyApp')).toBeInTheDocument();
     });
 
-    it('renders input with default placeholder', () => {
+    it('renders the Add task button', () => {
       render(<Topbar onToggleTheme={onToggleTheme} />);
 
-      expect(screen.getByPlaceholderText('Add a task...')).toBeInTheDocument();
-    });
-
-    it('renders input with custom placeholder', () => {
-      render(<Topbar placeholder="Create a new item" onToggleTheme={onToggleTheme} />);
-
-      expect(screen.getByPlaceholderText('Create a new item')).toBeInTheDocument();
+      expect(screen.getByText('Add task')).toBeInTheDocument();
     });
 
     it('renders the theme toggle button', () => {
       render(<Topbar onToggleTheme={onToggleTheme} />);
 
-      expect(screen.getByLabelText('Refresh')).toBeInTheDocument();
+      expect(screen.getByLabelText('Toggle theme')).toBeInTheDocument();
     });
 
     it('displays first character of app name in icon badge', () => {
@@ -48,12 +42,12 @@ describe('Topbar', () => {
   });
 
   describe('interactions', () => {
-    it('calls onAddTask when input is clicked', () => {
+    it('calls onAddTask when Add task button is clicked', () => {
       const onAddTask = jest.fn();
 
       render(<Topbar onAddTask={onAddTask} onToggleTheme={onToggleTheme} />);
 
-      fireEvent.click(screen.getByPlaceholderText('Add a task...'));
+      fireEvent.click(screen.getByText('Add task'));
 
       expect(onAddTask).toHaveBeenCalledTimes(1);
     });
@@ -61,7 +55,7 @@ describe('Topbar', () => {
     it('calls onToggleTheme with false when isDark is true', () => {
       render(<Topbar onToggleTheme={onToggleTheme} isDark={true} />);
 
-      fireEvent.click(screen.getByLabelText('Refresh'));
+      fireEvent.click(screen.getByLabelText('Toggle theme'));
 
       expect(onToggleTheme).toHaveBeenCalledWith(false);
     });
@@ -69,7 +63,7 @@ describe('Topbar', () => {
     it('calls onToggleTheme with true when isDark is false', () => {
       render(<Topbar onToggleTheme={onToggleTheme} isDark={false} />);
 
-      fireEvent.click(screen.getByLabelText('Refresh'));
+      fireEvent.click(screen.getByLabelText('Toggle theme'));
 
       expect(onToggleTheme).toHaveBeenCalledWith(true);
     });
