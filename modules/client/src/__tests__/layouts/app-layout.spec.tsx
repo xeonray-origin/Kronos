@@ -8,9 +8,10 @@ const SAMPLE_TASK = {
 };
 
 describe('AppLayout', () => {
-  it('renders the sidebar', () => {
+  it('renders the sidebar hidden below md', () => {
     render(<AppLayout tasks={[]} />);
-    expect(screen.getByText('Xeonray')).toBeInTheDocument();
+    const sidebarWrapper = screen.getByText('Xeonray').closest('.hidden');
+    expect(sidebarWrapper).toHaveClass('hidden', 'md:block');
   });
 
   it('renders tasks passed as props in the task list', () => {
@@ -18,8 +19,9 @@ describe('AppLayout', () => {
     expect(screen.getByText('Review pull request #482')).toBeInTheDocument();
   });
 
-  it('renders the timer', () => {
+  it('renders the timer hidden below lg', () => {
     render(<AppLayout tasks={[]} />);
-    expect(screen.getByText('25:00')).toBeInTheDocument();
+    const timerWrapper = screen.getByText('25:00').closest('.hidden');
+    expect(timerWrapper).toHaveClass('hidden', 'lg:block');
   });
 });
