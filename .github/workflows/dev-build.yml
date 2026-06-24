@@ -1,0 +1,38 @@
+name: Dev Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: Module to build
+        required: true
+        type: choice
+        options:
+          - client
+          - server
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: modules/${{ github.event.inputs.module }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: modules/${{ github.event.inputs.module }}/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build:${{ github.event.inputs.module }}
