@@ -7,12 +7,14 @@ jest.mock('@/models', () => ({
     create: jest.fn(),
     findByIdAndUpdate: jest.fn(),
     findByIdAndDelete: jest.fn(),
+    find: jest.fn(),
   },
 }));
 
 const mockCreate = TaskModel.create as jest.Mock;
 const mockFindByIdAndUpdate = TaskModel.findByIdAndUpdate as jest.Mock;
 const mockFindByIdAndDelete = TaskModel.findByIdAndDelete as jest.Mock;
+const mockFind = TaskModel.find as jest.Mock;
 
 describe('TaskDAO', () => {
   let dao: TaskDAO;
@@ -87,6 +89,24 @@ describe('TaskDAO', () => {
       mockFindByIdAndDelete.mockRejectedValueOnce(new Error('DB delete failed'));
 
       await expect(dao.delete(taskId)).rejects.toThrow('DB delete failed');
+    });
+  });
+
+  describe('findByUserId', () => {
+    it('returns all tasks for the given userId', async () => {
+      const tasks = [taskDoc];
+      mockFind.mockResolvedValueOnce(tasks);
+
+      const result = await dao.findByUserId(userId.toString());
+
+      expect(mockFind).toHaveBeenCalledWith({ userId: userId.toString() });
+      expect(result).toEqual(tasks);
+    });
+
+    it('propagates errors thrown by the model', async () => {
+      mockFind.mockRejectedValueOnce(new Error('DB find failed'));
+
+      await expect(dao.findByUserId(userId.toString())).rejects.toThrow('DB find failed');
     });
   });
 });

@@ -40,8 +40,7 @@ export default class AuthController {
       secure: true,
       sameSite: 'strict',
     });
-    const responsePayload = _.omit(result, ['refreshToken']);
-    return _.update(responsePayload, 'token', (token: string) => `Bearer-${token}`);
+    return _.omit(result, ['refreshToken']);
   }
 
   async refresh(
@@ -59,8 +58,7 @@ export default class AuthController {
       sameSite: 'strict',
       maxAge: result.maxCookieAge,
     });
-    const responsePayload = _.omit(result, ['refreshToken']);
-    return _.update(responsePayload, 'token', (token: string) => `Bearer-${token}`);
+    return _.omit(result, ['refreshToken']);
   }
 
   async logout(

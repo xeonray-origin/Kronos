@@ -8,6 +8,7 @@ export default class TaskController {
     protected createTask: IAction<Task>,
     protected updateTask: IAction<Task>,
     protected deleteTask: IAction<string, boolean>,
+    protected getUserTasks: IAction<string, Task[]>,
   ) {}
 
   async create(request: IRequest): Promise<Task> {
@@ -24,5 +25,10 @@ export default class TaskController {
   async delete(request: IRequest): Promise<boolean> {
     const id = request.params?.id as string;
     return this.deleteTask.call(id);
+  }
+
+  async getByUser(request: IRequest): Promise<Task[]> {
+    const userId = request.params?.userId as string;
+    return this.getUserTasks.call(userId);
   }
 }

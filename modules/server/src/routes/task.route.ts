@@ -1,6 +1,8 @@
-import { CreateTask, DeleteTask, UpdateTask } from '@/actions';
+import { CreateTask, DeleteTask, GetUserTasks, UpdateTask } from '@/actions';
 import { TaskController } from '@/controllers';
 import { TaskDAO } from '@/dao';
+import SessionMiddleware from '@/middlewares/session.middleware';
+import { JWTToken } from '@/utils';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
 const taskDAO = new TaskDAO();
@@ -8,9 +10,30 @@ const taskDAO = new TaskDAO();
 const CreateTaskAction = new CreateTask(taskDAO);
 const UpdateTaskAction = new UpdateTask(taskDAO);
 const DeleteTaskAction = new DeleteTask(taskDAO);
+const GetUserTasksAction = new GetUserTasks(taskDAO);
 
-const controller = new TaskController(CreateTaskAction, UpdateTaskAction, DeleteTaskAction);
+const sessionMiddleware = new SessionMiddleware(new JWTToken());
+const controller = new TaskController(
+  CreateTaskAction,
+  UpdateTaskAction,
+  DeleteTaskAction,
+  GetUserTasksAction,
+);
 const router: Router = express.Router();
+
+router.get(
+  '/',
+  (req: Request, res: Response, next: NextFunction) => sessionMiddleware.handle(req, res, next),
+  async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const userId = response.locals.user.userId as string;
+      const result = await controller.getByUser({ params: { userId } });
+      response.send(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 router.post('/create', async (request: Request, response: Response, next: NextFunction) => {
   try {

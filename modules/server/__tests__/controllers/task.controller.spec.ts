@@ -17,12 +17,19 @@ describe('TaskController', () => {
   let mockCreateTask: jest.Mocked<IAction<Task>>;
   let mockUpdateTask: jest.Mocked<IAction<Task>>;
   let mockDeleteTask: jest.Mocked<IAction<string, boolean>>;
+  let mockGetUserTasks: jest.Mocked<IAction<string, Task[]>>;
 
   beforeEach(() => {
     mockCreateTask = { call: jest.fn() };
     mockUpdateTask = { call: jest.fn() };
     mockDeleteTask = { call: jest.fn() };
-    controller = new TaskController(mockCreateTask, mockUpdateTask, mockDeleteTask);
+    mockGetUserTasks = { call: jest.fn() };
+    controller = new TaskController(
+      mockCreateTask,
+      mockUpdateTask,
+      mockDeleteTask,
+      mockGetUserTasks,
+    );
   });
 
   describe('create', () => {
@@ -59,6 +66,18 @@ describe('TaskController', () => {
 
       expect(mockDeleteTask.call).toHaveBeenCalledWith(id);
       expect(result).toBe(true);
+    });
+  });
+
+  describe('getByUser', () => {
+    it('delegates to getUserTasks action with userId from params and returns the result', async () => {
+      const tasks = [taskDoc];
+      mockGetUserTasks.call.mockResolvedValue(tasks);
+
+      const result = await controller.getByUser({ params: { userId: userId.toString() } });
+
+      expect(mockGetUserTasks.call).toHaveBeenCalledWith(userId.toString());
+      expect(result).toBe(tasks);
     });
   });
 });

@@ -16,6 +16,7 @@ const mockTaskDAO: ITaskDAO = {
   create: jest.fn(),
   update: jest.fn(),
   delete: jest.fn(),
+  findByUserId: jest.fn(),
 };
 
 describe('UpdateTask', () => {

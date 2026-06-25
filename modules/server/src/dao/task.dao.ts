@@ -18,4 +18,9 @@ export class TaskDAO implements ITaskDAO {
     await TaskModel.findByIdAndDelete(id);
     return true;
   }
+
+  async findByUserId(userId: string): Promise<Task[]> {
+    const tasks = await TaskModel.find({ userId });
+    return tasks as unknown as Task[];
+  }
 }

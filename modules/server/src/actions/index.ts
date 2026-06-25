@@ -5,6 +5,7 @@ import LogoutUser from './user/logout';
 import CreateTask from './task/create';
 import UpdateTask from './task/update';
 import DeleteTask from './task/delete';
+import GetUserTasks from './task/get-user-tasks';
 import CreateProject from './project/create';
 import UpdateProject from './project/update';
 import DeleteProject from './project/delete';
@@ -17,6 +18,7 @@ export {
   CreateTask,
   UpdateTask,
   DeleteTask,
+  GetUserTasks,
   CreateProject,
   UpdateProject,
   DeleteProject,

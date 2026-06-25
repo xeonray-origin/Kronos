@@ -68,13 +68,13 @@ describe('AuthController', () => {
       });
     });
 
-    it('returns the access token with Bearer prefix and omits refreshToken', async () => {
+    it('returns the raw access token and omits refreshToken', async () => {
       const response = makeResponse() as unknown as Response;
       mockLoginUser.call.mockResolvedValue(loginOutput);
 
       const result = await controller.login({ body }, response);
 
-      expect(result).toEqual({ success: true, token: 'Bearer-access.token' });
+      expect(result).toEqual({ success: true, token: 'access.token' });
       expect(result).not.toHaveProperty('refreshToken');
     });
   });
@@ -102,7 +102,7 @@ describe('AuthController', () => {
       });
     });
 
-    it('returns the new access token with Bearer prefix and omits refreshToken', async () => {
+    it('returns the new raw access token and omits refreshToken', async () => {
       const response = makeResponse() as unknown as Response;
       mockRefreshToken.call.mockResolvedValue(refreshOutput);
 
@@ -110,7 +110,7 @@ describe('AuthController', () => {
 
       expect(result).toEqual({
         success: true,
-        token: 'Bearer-new.access.token',
+        token: 'new.access.token',
         maxCookieAge: refreshOutput.maxCookieAge,
       });
       expect(result).not.toHaveProperty('refreshToken');
