@@ -1,13 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import AuthenticationLayout from '@/layouts/authentication';
-import { LoginForm } from '@/components';
-
-jest.mock('react-router', () => ({
-  useNavigate: () => jest.fn(),
-  Outlet: () => {
-    return <LoginForm />;
-  },
-}));
 
 describe('Login route', () => {
   it('renders the welcome heading', () => {
