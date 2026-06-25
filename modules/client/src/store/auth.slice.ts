@@ -33,6 +33,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setToken, clearToken } = authSlice.actions;
+export const authActions = authSlice.actions;
 
 export default authSlice.reducer;

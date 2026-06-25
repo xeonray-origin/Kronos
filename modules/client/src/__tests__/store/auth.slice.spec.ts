@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer, { clearToken, IAuthState, setToken } from '@/store/auth.slice';
+import authReducer, { authActions, IAuthState } from '@/store/auth.slice';
 
 function makeStore(preloaded?: Partial<IAuthState>) {
   return configureStore({
@@ -29,7 +29,7 @@ describe('auth slice', () => {
         status: 'failed',
         error: 'old error',
       });
-      store.dispatch(setToken('abc.def.ghi'));
+      store.dispatch(authActions.setToken('abc.def.ghi'));
       expect(store.getState().auth).toEqual({
         isLoggedIn: true,
         token: 'abc.def.ghi',
@@ -42,7 +42,7 @@ describe('auth slice', () => {
   describe('clearToken', () => {
     it('clears token, marks as logged out, and resets status and error', () => {
       const store = makeStore({ isLoggedIn: true, token: 'tok', status: 'failed', error: 'err' });
-      store.dispatch(clearToken());
+      store.dispatch(authActions.clearToken());
       expect(store.getState().auth).toEqual({
         isLoggedIn: false,
         token: '',
