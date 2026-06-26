@@ -1,7 +1,8 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import authReducer from './auth.slice';
+import tasksReducer from './tasks.slice';
 import { useDispatch, TypedUseSelectorHook, useSelector } from 'react-redux';
-export const rootReducer = combineReducers({ auth: authReducer });
+export const rootReducer = combineReducers({ auth: authReducer, tasks: tasksReducer });
 
 const store = configureStore({ reducer: rootReducer });
 
