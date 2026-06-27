@@ -1,5 +1,4 @@
-import { useAppDispatch, useAppSelector } from '@/store';
-import { fetchTasks } from '@/store/tasks.slice';
+import { useAppDispatch, useAppSelector, fetchTasks } from '@/store';
 
 export function useTasks() {
   const dispatch = useAppDispatch();
