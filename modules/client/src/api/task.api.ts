@@ -1,4 +1,4 @@
 import client from './client';
-import type { ServerTask } from '@/types';
+import type { ITask } from '@/types';
 
-export const getTasks = () => client.get<ServerTask[]>('/tasks').then((response) => response.data);
+export const getTasks = () => client.get<ITask[]>('/tasks').then((response) => response.data);

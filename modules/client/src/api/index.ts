@@ -1,4 +1,4 @@
 import client from './client';
-import { getTasks } from './task.api';
+import * as taskApi from './task.api';
 
-export { client, getTasks };
+export { client, taskApi };

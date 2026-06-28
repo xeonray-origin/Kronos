@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getTasks } from '@/api/task.api';
-import type { ServerTask } from '@/types';
+import { taskApi } from '@/api';
+import type { ITask } from '@/types';
 
 export interface TasksState {
-  items: ServerTask[];
+  items: ITask[];
   status: 'idle' | 'loading' | 'failed';
   error: string | null;
 }
@@ -14,11 +14,11 @@ const initialState: TasksState = {
   error: null,
 };
 
-export const fetchTasks = createAsyncThunk<ServerTask[], void, { rejectValue: string }>(
+export const fetchTasks = createAsyncThunk<ITask[], void, { rejectValue: string }>(
   'tasks/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      return await getTasks();
+      return await taskApi.getTasks();
     } catch (e) {
       const err = e as { response?: { data?: { error?: string } } };
       return rejectWithValue(err.response?.data?.error ?? 'Failed to fetch tasks');

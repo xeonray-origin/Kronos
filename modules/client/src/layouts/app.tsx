@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Sidebar, TaskList, Timer } from '@/components';
 import { useTasks } from '@/hooks/useTasks';
-import type { ServerTask } from '@/types';
+import type { ITask } from '@/types';
 
 type TaskStatus = 'todo' | 'in-progress' | 'done';
 
@@ -21,7 +21,7 @@ interface TaskListItem {
   showTimer?: boolean;
 }
 
-function toTaskListItem(task: ServerTask): TaskListItem {
+function toTaskListItem(task: ITask): TaskListItem {
   return {
     id: task._id,
     status: 'todo',

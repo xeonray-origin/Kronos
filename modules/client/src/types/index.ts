@@ -1,1 +1,1 @@
-export type { ServerTask } from './task.types';
+export type { ITask } from './task.types';

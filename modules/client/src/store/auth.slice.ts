@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 export interface IAuthState {
   isLoggedIn: boolean;
   token: string;
+  user: {};
   status: 'idle' | 'loading' | 'failed';
   error: string | null;
 }
@@ -11,6 +12,7 @@ const initialState: IAuthState = {
   isLoggedIn: false,
   token: '',
   status: 'idle',
+  user: {},
   error: null,
 };
 
@@ -19,16 +21,10 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     setToken(state, action: PayloadAction<string>) {
-      state.token = action.payload;
-      state.isLoggedIn = true;
-      state.status = 'idle';
-      state.error = null;
+      return { ...state, token: action.payload };
     },
     clearToken(state) {
-      state.token = '';
-      state.isLoggedIn = false;
-      state.status = 'idle';
-      state.error = null;
+      return { ...state, token: '', isLoggedIn: false, status: 'idle', user: {} };
     },
   },
 });
