@@ -1,5 +1,7 @@
 import { Task } from '@/components/task';
+import { useTasks } from '@/hooks/useTasks';
 import { cn } from '@/lib/utils';
+import { useEffect } from 'react';
 
 type TaskStatus = 'todo' | 'in-progress' | 'done';
 
@@ -30,6 +32,12 @@ const GROUPS: { status: TaskStatus; label: string; dotClass: string }[] = [
 ];
 
 export function TaskList({ tasks }: TaskListProps) {
+  const { fetchTasks } = useTasks();
+
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
   const grouped = tasks.reduce<Record<TaskStatus, TaskListItem[]>>(
     (acc, task) => {
       acc[task.status].push(task);

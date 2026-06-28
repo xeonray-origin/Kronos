@@ -1,8 +1,12 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import authReducer from './auth.slice';
-import tasksReducer from './tasks.slice';
+
 import { useDispatch, TypedUseSelectorHook, useSelector } from 'react-redux';
-export const rootReducer = combineReducers({ auth: authReducer, tasks: tasksReducer });
+import { authSlice, taskSlice } from './slice';
+
+export const rootReducer = combineReducers({
+  auth: authSlice.reducer,
+  tasks: taskSlice.reducer,
+});
 
 const store = configureStore({ reducer: rootReducer });
 

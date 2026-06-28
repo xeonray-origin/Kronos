@@ -1,5 +1,9 @@
-import { authActions } from './auth.slice';
-import { fetchTasks, taskActions } from './tasks.slice';
 import { store, useAppDispatch, useAppSelector } from './store';
+import { taskSlice, authSlice } from './slice';
 
-export { authActions, taskActions, fetchTasks, store, useAppDispatch, useAppSelector };
+const taskActions = taskSlice.actions;
+const authActions = authSlice.actions;
+
+export { authActions, taskActions };
+
+export { store, useAppDispatch, useAppSelector };

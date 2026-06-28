@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { TaskList } from '@/components';
 
+jest.mock('@/hooks/useTasks', () => ({
+  useTasks: () => ({ tasks: [], error: null, fetchTasks: jest.fn() }),
+}));
+
 const TODO_TASK = { id: '1', status: 'todo' as const, title: 'Write docs' };
 const IN_PROGRESS_TASK = { id: '2', status: 'in-progress' as const, title: 'Fix bug' };
 const DONE_TASK = { id: '3', status: 'done' as const, title: 'Ship feature', completed: true };

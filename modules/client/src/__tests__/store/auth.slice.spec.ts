@@ -1,54 +1,46 @@
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer, { authActions, IAuthState } from '@/store/auth.slice';
+import { authSlice, IAuthState } from '@/store/slice/auth.slice';
 
-function makeStore(preloaded?: Partial<IAuthState>) {
-  return configureStore({
-    reducer: { auth: authReducer },
-    preloadedState: preloaded ? { auth: preloaded as IAuthState } : undefined,
-  });
-}
+const reducer = authSlice.reducer;
+const { setToken, clearToken } = authSlice.actions;
+
+const initialState: IAuthState = {
+  isLoggedIn: false,
+  token: '',
+  status: 'idle',
+  user: {},
+  error: null,
+};
 
 describe('auth slice', () => {
-  describe('initial state', () => {
-    it('has the correct shape', () => {
-      const store = makeStore();
-      expect(store.getState().auth).toEqual({
-        isLoggedIn: false,
-        token: '',
-        status: 'idle',
-        error: null,
-      });
+  it('returns the initial state', () => {
+    expect(reducer(undefined, { type: '@@INIT' })).toEqual(initialState);
+  });
+
+  it('setToken stores the token without touching other fields', () => {
+    const state = reducer(
+      { ...initialState, status: 'failed', error: 'old error' },
+      setToken('abc.def.ghi'),
+    );
+    expect(state).toEqual({
+      isLoggedIn: false,
+      token: 'abc.def.ghi',
+      status: 'failed',
+      user: {},
+      error: 'old error',
     });
   });
 
-  describe('setToken', () => {
-    it('sets token, marks as logged in, and clears status and error', () => {
-      const store = makeStore({
-        isLoggedIn: false,
-        token: '',
-        status: 'failed',
-        error: 'old error',
-      });
-      store.dispatch(authActions.setToken('abc.def.ghi'));
-      expect(store.getState().auth).toEqual({
-        isLoggedIn: true,
-        token: 'abc.def.ghi',
-        status: 'idle',
-        error: null,
-      });
-    });
-  });
-
-  describe('clearToken', () => {
-    it('clears token, marks as logged out, and resets status and error', () => {
-      const store = makeStore({ isLoggedIn: true, token: 'tok', status: 'failed', error: 'err' });
-      store.dispatch(authActions.clearToken());
-      expect(store.getState().auth).toEqual({
-        isLoggedIn: false,
-        token: '',
-        status: 'idle',
-        error: null,
-      });
+  it('clearToken resets token, login flag, status and user', () => {
+    const state = reducer(
+      { isLoggedIn: true, token: 'tok', status: 'failed', user: { id: 1 }, error: 'err' },
+      clearToken(),
+    );
+    expect(state).toEqual({
+      isLoggedIn: false,
+      token: '',
+      status: 'idle',
+      user: {},
+      error: 'err',
     });
   });
 });

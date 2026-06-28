@@ -7,13 +7,13 @@ jest.mock('@/api/client', () => ({
 }));
 
 describe('getTasks', () => {
-  it('calls GET /tasks and returns the response data', async () => {
+  it('calls GET /task and returns the response data', async () => {
     const mockTasks = [{ _id: '1', title: 'Task', userId: 'u1' }];
     (client.get as jest.Mock).mockResolvedValue({ data: mockTasks });
 
     const result = await getTasks();
 
-    expect(client.get).toHaveBeenCalledWith('/tasks');
+    expect(client.get).toHaveBeenCalledWith('/task');
     expect(result).toEqual(mockTasks);
   });
 

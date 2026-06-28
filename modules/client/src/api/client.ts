@@ -5,6 +5,14 @@ const client = axios.create({
   withCredentials: true,
 });
 
+client.interceptors.request.use((config) => {
+  const token = store.getState().auth.token;
+  if (token) {
+    config.headers.Authorization = token;
+  }
+  return config;
+});
+
 client.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -23,13 +31,5 @@ client.interceptors.response.use(
     throw error;
   },
 );
-
-client.interceptors.request.use((config) => {
-  const token = store.getState().auth.token;
-  if (token) {
-    config.headers.Authorization = token;
-  }
-  return config;
-});
 
 export default client;
