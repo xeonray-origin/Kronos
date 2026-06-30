@@ -6,10 +6,15 @@ export function useTasks() {
   const { items, status, error } = useAppSelector((state) => state.tasks);
 
   const fetchTasks = async () => {
-    dispatch(taskActions.setStatus('loading'));
-    const response = await taskApi.getTasks();
-    if (response) dispatch(taskActions.setTasks(response));
-    dispatch(taskActions.setStatus('idle'));
+    try {
+      dispatch(taskActions.setStatus('loading'));
+      const response = await taskApi.getTasks();
+      if (response) dispatch(taskActions.setTasks(response));
+      dispatch(taskActions.setStatus('idle'));
+    } catch (e) {
+      console.log(e);
+      dispatch(taskActions.setTasks([]));
+    }
   };
 
   return {

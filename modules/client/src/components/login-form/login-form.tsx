@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { Button, Card, CardContent, Checkbox, Input } from '@/components/base';
+import { authApi } from '@/api';
+import { authActions, useAppDispatch } from '@/store';
+import { redirect, useNavigate } from 'react-router';
 
 function GoogleIcon() {
   return (
@@ -30,6 +33,17 @@ export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const dispatch = useAppDispatch();
+  let navigate = useNavigate();
+  const handleSubmit = async () => {
+    try {
+      const response = await authApi.initateLogin({ email, password });
+      if (response.token) {
+        dispatch(authActions.setToken(response.token));
+        navigate('/dashboard');
+      }
+    } catch (e) {}
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -98,7 +112,8 @@ export function LoginForm() {
 
         <Button
           className="w-full h-10 bg-foreground text-background hover:bg-foreground/85"
-          type="submit"
+          type="button"
+          onClick={handleSubmit}
         >
           Sign in
         </Button>

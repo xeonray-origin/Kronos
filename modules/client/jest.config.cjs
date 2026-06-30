@@ -19,6 +19,7 @@ const config = {
   },
   moduleNameMapper: {
     '\\.css$': '<rootDir>/src/__mocks__/styleMock.js',
+    '^react-router$': '<rootDir>/src/__mocks__/reactRouterMock.tsx',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   setupFilesAfterEnv: ['@testing-library/jest-dom'],

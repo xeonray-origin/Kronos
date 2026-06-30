@@ -8,23 +8,33 @@ const client = axios.create({
 client.interceptors.request.use((config) => {
   const token = store.getState().auth.token;
   if (token) {
-    config.headers.Authorization = token;
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
+const REFRESH_URL = '/auth/refresh';
+
 client.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
+    const originalRequest = error.config;
+    const canRefresh =
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      originalRequest.url !== REFRESH_URL;
+
+    if (canRefresh) {
+      originalRequest._retry = true;
       try {
-        const res = await axios.get('/auth/refresh');
+        const res = await client.get(REFRESH_URL);
         const { token } = res.data;
         store.dispatch(authActions.setToken(token));
-        error.config.headers.Authorization = token;
-        return client(error.config);
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        return client.request(originalRequest);
       } catch (refreshError) {
-        console.error('Refresh token expired or invalid');
+        store.dispatch(authActions.clearToken());
         throw refreshError;
       }
     }
