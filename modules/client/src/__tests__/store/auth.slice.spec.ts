@@ -16,13 +16,13 @@ describe('auth slice', () => {
     expect(reducer(undefined, { type: '@@INIT' })).toEqual(initialState);
   });
 
-  it('setToken stores the token without touching other fields', () => {
+  it('setToken stores the token and marks the session logged in', () => {
     const state = reducer(
       { ...initialState, status: 'failed', error: 'old error' },
       setToken('abc.def.ghi'),
     );
     expect(state).toEqual({
-      isLoggedIn: false,
+      isLoggedIn: true,
       token: 'abc.def.ghi',
       status: 'failed',
       user: {},

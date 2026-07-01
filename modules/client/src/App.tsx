@@ -1,8 +1,7 @@
 import { Topbar, CreateTaskModal } from '@/components';
 import { useState } from 'react';
-import { Route, Routes } from 'react-router';
 import './global.css';
-import { AppLayout, AuthLayout } from './layouts';
+import { AppRoutes } from './routes';
 import { cn } from './lib/utils';
 
 export default function App() {
@@ -22,10 +21,7 @@ export default function App() {
           onClose={() => setIsModalOpen(false)}
           onSubmit={() => setIsModalOpen(false)}
         />
-        <Routes>
-          <Route path="/" element={<AuthLayout />} />
-          <Route path="/dashboard" element={<AppLayout />} />
-        </Routes>
+        <AppRoutes />
       </div>
     </div>
   );
