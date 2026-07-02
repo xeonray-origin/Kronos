@@ -2,11 +2,7 @@ import { useState, useEffect } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { Button } from '@/components/base/button';
 import { cn } from '@/lib/utils';
-
-interface TimerProps {
-  initialMinutes?: number;
-  label?: string;
-}
+import type { TimerProps } from '@/types';
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60)

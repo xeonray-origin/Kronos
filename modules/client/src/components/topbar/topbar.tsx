@@ -2,13 +2,7 @@ import { Sun, Moon, Plus } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/base';
-
-export interface TopbarProps {
-  appName?: string;
-  onAddTask?: () => void;
-  onToggleTheme: (value: boolean) => void;
-  isDark?: boolean;
-}
+import type { TopbarProps } from '@/types';
 
 export function Topbar({
   appName = 'Tempo',

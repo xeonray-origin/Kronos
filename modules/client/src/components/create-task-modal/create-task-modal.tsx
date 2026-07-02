@@ -8,19 +8,7 @@ import {
   DialogTitle,
   Input,
 } from '@/components/base';
-
-interface NewTask {
-  title: string;
-  description?: string;
-  dueDate?: string;
-  project?: string;
-}
-
-interface CreateTaskModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (task: NewTask) => void;
-}
+import type { CreateTaskModalProps } from '@/types';
 
 const EMPTY_FORM = { title: '', description: '', dueDate: '', project: '' };
 

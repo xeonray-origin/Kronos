@@ -1,6 +1,5 @@
-import { ITask } from '@/types';
+import type { ApiStatus, ITask, ITasksState } from '@/types';
 import { PayloadAction } from '@reduxjs/toolkit';
-import { ApiStatus, ITasksState } from '../slice';
 
 export default {
   setTasks(state: ITasksState, action: PayloadAction<ITask[]>) {

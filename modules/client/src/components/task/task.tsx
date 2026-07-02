@@ -1,21 +1,7 @@
 import { BellIcon, CalendarIcon, CheckIcon, FlagIcon, ClockIcon } from 'lucide-react';
 import { Badge } from '@/components/base/badge';
 import { cn } from '@/lib/utils';
-
-interface TaskProps {
-  title: string;
-  dueDate?: string;
-  dueDateMuted?: boolean;
-  label?: string;
-  labels?: string[];
-  project?: string;
-  description?: string;
-  priority?: 'none' | 'low' | 'medium' | 'high';
-  completed?: boolean;
-  progress?: { filled: number; total: number };
-  flagColor?: 'orange' | 'blue' | 'gray';
-  showTimer?: boolean;
-}
+import type { TaskProps } from '@/types';
 
 const priorityCircleClass: Record<string, string> = {
   none: 'border-muted-foreground/40',

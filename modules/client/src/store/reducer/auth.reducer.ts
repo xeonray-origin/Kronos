@@ -1,5 +1,5 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import { IAuthState } from '../slice/auth.slice';
+import type { IAuthState } from '@/types';
 
 export default {
   setToken(state: IAuthState, action: PayloadAction<string>) {

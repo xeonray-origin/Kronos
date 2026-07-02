@@ -1,13 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import type { IAuthState } from '@/types';
 import { authReducer } from '../reducer';
-
-export interface IAuthState {
-  isLoggedIn: boolean;
-  token: string;
-  user: {};
-  status: 'idle' | 'loading' | 'failed';
-  error: string | null;
-}
 
 const initialState: IAuthState = {
   isLoggedIn: false,

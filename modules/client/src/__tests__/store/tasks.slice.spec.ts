@@ -1,4 +1,5 @@
-import { taskSlice, ITasksState } from '@/store/slice/task.slice';
+import { taskSlice } from '@/store/slice/task.slice';
+import type { ITasksState } from '@/types';
 
 const reducer = taskSlice.reducer;
 const { setTasks, addTask, setStatus } = taskSlice.actions;

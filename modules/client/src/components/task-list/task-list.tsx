@@ -1,27 +1,6 @@
 import { Task } from '@/components/task';
 import { cn } from '@/lib/utils';
-
-type TaskStatus = 'todo' | 'in-progress' | 'done';
-
-interface TaskListItem {
-  id: string;
-  status: TaskStatus;
-  title: string;
-  dueDate?: string;
-  dueDateMuted?: boolean;
-  label?: string;
-  labels?: string[];
-  project?: string;
-  priority?: 'none' | 'low' | 'medium' | 'high';
-  completed?: boolean;
-  progress?: { filled: number; total: number };
-  flagColor?: 'orange' | 'blue' | 'gray';
-  showTimer?: boolean;
-}
-
-interface TaskListProps {
-  tasks: TaskListItem[];
-}
+import type { TaskListItem, TaskListProps, TaskStatus } from '@/types';
 
 const GROUPS: { status: TaskStatus; label: string; dotClass: string }[] = [
   { status: 'todo', label: 'To Do', dotClass: 'bg-muted-foreground' },

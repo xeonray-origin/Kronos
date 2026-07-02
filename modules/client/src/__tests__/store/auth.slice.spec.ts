@@ -1,4 +1,5 @@
-import { authSlice, IAuthState } from '@/store/slice/auth.slice';
+import { authSlice } from '@/store/slice/auth.slice';
+import type { IAuthState } from '@/types';
 
 const reducer = authSlice.reducer;
 const { setToken, clearToken } = authSlice.actions;

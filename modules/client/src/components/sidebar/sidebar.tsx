@@ -14,7 +14,6 @@ import {
   Search,
   TriangleAlert,
   Users,
-  type LucideIcon,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -29,26 +28,7 @@ import {
   AvatarImage,
   Button,
 } from '@/components/base';
-
-interface NavLink {
-  icon: LucideIcon;
-  label: string;
-  count?: number;
-  active?: boolean;
-}
-
-interface Project {
-  name: string;
-  emoji?: string;
-  shared?: boolean;
-  count?: number;
-}
-
-interface SidebarProps {
-  user?: { name: string; avatarUrl?: string };
-  links?: NavLink[];
-  projects?: Project[];
-}
+import type { NavLink, Project, SidebarProps } from '@/types';
 
 const defaultLinks: NavLink[] = [
   { icon: Inbox, label: 'Inbox', count: 8 },

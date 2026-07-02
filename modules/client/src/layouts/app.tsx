@@ -1,25 +1,7 @@
 import React, { useEffect } from 'react';
 import { Sidebar, TaskList, Timer } from '@/components';
 import { useTasks } from '@/hooks/useTasks';
-import type { ITask } from '@/types';
-
-type TaskStatus = 'todo' | 'in-progress' | 'done';
-
-interface TaskListItem {
-  id: string;
-  status: TaskStatus;
-  title: string;
-  dueDate?: string;
-  dueDateMuted?: boolean;
-  label?: string;
-  labels?: string[];
-  project?: string;
-  priority?: 'none' | 'low' | 'medium' | 'high';
-  completed?: boolean;
-  progress?: { filled: number; total: number };
-  flagColor?: 'orange' | 'blue' | 'gray';
-  showTimer?: boolean;
-}
+import type { ITask, TaskListItem } from '@/types';
 
 function toTaskListItem(task: ITask): TaskListItem {
   return {

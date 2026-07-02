@@ -2,8 +2,9 @@ import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { taskSlice, ITasksState } from '@/store/slice/task.slice';
+import { taskSlice } from '@/store/slice/task.slice';
 import { authSlice } from '@/store/slice/auth.slice';
+import type { ITasksState } from '@/types';
 import { useTasks } from '@/hooks/useTasks';
 
 jest.mock('@/api/task.api');
