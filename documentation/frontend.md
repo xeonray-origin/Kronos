@@ -1,17 +1,15 @@
 # Frontend — `@kronos/client`
 
-React 19 SPA bundled with Webpack 5. Entry point: `src/main.tsx`. Output: `modules/client/dist/`.
-
-> New here? Read **Architecture at a glance** → **Data flow** → **How to contribute** in that order. The rest is reference.
+React 19 single-page application bundled with Webpack 5. Entry point: `src/main.tsx`. Build output: `modules/client/dist/`.
 
 ## Stack
 
 | Concern              | Library                                                                                |
 | -------------------- | -------------------------------------------------------------------------------------- |
 | UI framework         | React 19                                                                               |
-| Routing              | `react-router` v8 (`BrowserRouter`, `Routes`/`Route`)                                  |
+| Routing              | `react-router` v8 (`BrowserRouter`, `Routes`/`Route`, layout routes with `Outlet`)     |
 | State management     | Redux Toolkit (`@reduxjs/toolkit`) + `react-redux`                                     |
-| HTTP client          | `axios` (single configured instance in `src/api/client.ts`)                            |
+| HTTP client          | `axios` — single configured instance in `src/api/client.ts`                            |
 | Styling              | Tailwind CSS v4 + CSS custom properties (OKLCH)                                        |
 | Component primitives | Radix UI (`radix-ui` v1.6)                                                             |
 | Variant management   | `class-variance-authority` (CVA)                                                       |
@@ -24,50 +22,57 @@ React 19 SPA bundled with Webpack 5. Entry point: `src/main.tsx`. Output: `modul
 
 ## Architecture at a glance
 
-The client is organised into clear horizontal layers. Data flows **down** (server → store → hooks → components) and intents flow **up** (component → hook → store/api → server).
+The client is organised into horizontal layers. Data flows **down** (server → store → hooks → components) and intents flow **up** (component → hook → store/api → server).
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  main.tsx        BrowserRouter → Redux Provider → App         │
-├─────────────────────────────────────────────────────────────┤
-│  App.tsx         theme state · Topbar · modal · <Routes>      │
-├─────────────────────────────────────────────────────────────┤
-│  layouts/        route-level containers (AuthLayout, AppLayout)│
-├─────────────────────────────────────────────────────────────┤
-│  components/     base/ (UI primitives) + feature components    │
-├─────────────────────────────────────────────────────────────┤
-│  hooks/          orchestration (useTasks) — store ⇄ api glue   │
-├─────────────────────────────────────────────────────────────┤
-│  store/          Redux Toolkit slices + reducers + typed hooks │
-├─────────────────────────────────────────────────────────────┤
-│  api/            axios client + per-domain request modules     │
-└─────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────┐
+│  main.tsx        BrowserRouter → Redux Provider → App           │
+├────────────────────────────────────────────────────────────────┤
+│  App.tsx         theme state · Topbar · CreateTaskModal          │
+├────────────────────────────────────────────────────────────────┤
+│  routes/         route table + session guards (AppRoutes)        │
+├────────────────────────────────────────────────────────────────┤
+│  layouts/        route-level containers (AuthLayout, AppLayout)  │
+├────────────────────────────────────────────────────────────────┤
+│  components/     base/ (UI primitives) + feature components      │
+├────────────────────────────────────────────────────────────────┤
+│  hooks/          orchestration (useTasks) — store ⇄ api glue     │
+├────────────────────────────────────────────────────────────────┤
+│  store/          Redux Toolkit slices + reducers + typed hooks   │
+├────────────────────────────────────────────────────────────────┤
+│  api/            axios client + per-domain request modules       │
+└────────────────────────────────────────────────────────────────┘
 ```
 
-The guiding rule: **components stay presentational, hooks own orchestration, the store owns state, and `api/` owns transport.** A component should never call `axios` or `dispatch` a thunk-like sequence directly — it calls a hook.
+The guiding rule: **components stay presentational, hooks own orchestration, the store owns state, and `api/` owns transport.** A component never calls `axios` or dispatches a multi-step async sequence directly — it calls a hook.
 
 ## Project structure
 
 ```
 src/
 ├── main.tsx                # Mounts BrowserRouter → <Provider store> → <App>
-├── App.tsx                 # Theme (isDark) state, Topbar, CreateTaskModal, <Routes>
+├── App.tsx                 # Theme (isDark) state, Topbar, CreateTaskModal, <AppRoutes>
 ├── global.css              # @theme tokens (oklch, light + .dark class dark mode)
 ├── global.d.ts             # window.React declaration (module file)
-├── css.d.ts                # ambient `declare module '*.css'` (script file — no imports)
+├── css.d.ts                # Ambient `declare module '*.css'` (script file — no imports)
 ├── lib/utils.ts            # cn() — clsx + tailwind-merge
+│
+├── routes/
+│   ├── app-routes.tsx      # Route table wrapped in SessionGuard + route guards
+│   └── index.ts            # Barrel: { AppRoutes }
 │
 ├── api/                    # Transport layer
 │   ├── client.ts           # Configured axios instance + auth/refresh interceptors
+│   ├── auth.api.ts         # initateLogin, refreshSession
 │   ├── task.api.ts         # Task endpoints (getTasks, …) — return parsed data
-│   └── index.ts            # Barrel: { client, taskApi }
+│   └── index.ts            # Barrel: { client, taskApi, authApi }
 │
 ├── store/                  # Redux Toolkit state
 │   ├── store.ts            # configureStore, RootState/AppDispatch, typed hooks
 │   ├── index.ts            # Barrel: store, typed hooks, authActions, taskActions
 │   ├── slice/
-│   │   ├── auth.slice.ts   # auth state shape + createSlice(name: 'auth')
-│   │   ├── task.slice.ts   # tasks state shape + createSlice(name: 'tasks')
+│   │   ├── auth.slice.ts   # createSlice(name: 'auth') using authReducer map
+│   │   ├── task.slice.ts   # createSlice(name: 'tasks') using taskReducer map
 │   │   └── index.ts
 │   └── reducer/            # Reducer maps passed into each slice
 │       ├── auth.reducer.ts # setToken, clearToken
@@ -77,7 +82,7 @@ src/
 ├── hooks/
 │   └── useTasks.ts         # Selects task state + exposes fetchTasks() (api → dispatch)
 │
-├── layouts/                # Route-level containers (formerly pages/)
+├── layouts/                # Route-level containers
 │   ├── authentication.tsx  # AuthLayout — toggles LoginForm / SignupForm
 │   ├── app.tsx             # AppLayout — Sidebar + TaskList + Timer, calls useTasks
 │   └── index.ts            # Barrel: { AppLayout, AuthLayout }
@@ -87,8 +92,9 @@ src/
 │   │   ├── alert.tsx  avatar.tsx  badge.tsx  button.tsx  calendar.tsx
 │   │   ├── card.tsx  checkbox.tsx  dialog.tsx  input.tsx
 │   │   └── index.ts
-│   ├── login-form/         # Email + password form with Google OAuth button
-│   ├── signup-form/        # Name + email + password + confirm form
+│   ├── session/            # SessionGuard, ProtectedRoute, PublicRoute
+│   ├── login-form/         # Email + password form, wired to authApi.initateLogin
+│   ├── signup-form/        # Name + email + password + confirm form (not yet wired)
 │   ├── sidebar/            # Nav links, project list, user avatar
 │   ├── topbar/             # App name, task input, theme toggle, add-task trigger
 │   ├── task/               # Single task row (priority, labels, due date, progress, flag)
@@ -99,28 +105,49 @@ src/
 │
 ├── types/
 │   ├── task.types.ts       # ITask domain interface
+│   ├── auth.types.ts       # IAuthPayload, ILoginResponse, IRefreshResponse
+│   ├── store.types.ts      # IAuthState, ITasksState
+│   ├── component.types.ts  # Shared component prop types
 │   └── index.ts
 │
 └── __mocks__/
-    └── styleMock.js        # CSS stub for Jest
+    ├── styleMock.js        # CSS stub for Jest
+    └── reactRouterMock.tsx # react-router stub for Jest
 ```
 
 > Tests live in `src/__tests__/**` mirroring `src/` (e.g. `store/auth.slice.spec.ts`,
-> `api/task.api.spec.ts`, `hooks/useTasks.spec.ts`), with a couple of co-located
-> exceptions like `components/topbar/__tests__/topbar.spec.tsx`.
+> `api/client.spec.ts`, `hooks/useTasks.spec.ts`), with a few co-located exceptions such as
+> `components/topbar/__tests__/topbar.spec.tsx` and `components/session/__tests__/*.spec.tsx`.
 
-## Routing
+## Routing & session guards
 
-`main.tsx` wraps the app in `BrowserRouter`; `App.tsx` declares the route table:
+`main.tsx` wraps the app in `BrowserRouter`; `App.tsx` renders `<AppRoutes>` from `routes/app-routes.tsx`. The route table nests every route inside `SessionGuard`, then splits public and protected branches:
 
-| Path         | Element      | Purpose                          |
-| ------------ | ------------ | -------------------------------- |
-| `/`          | `AuthLayout` | Login / signup (toggle in-place) |
-| `/dashboard` | `AppLayout`  | Sidebar + TaskList + Timer       |
+```tsx
+<Routes>
+  <Route element={<SessionGuard />}>
+    <Route element={<PublicRoute />}>
+      <Route path="/" element={<AuthLayout />} />
+    </Route>
+    <Route element={<ProtectedRoute />}>
+      <Route path="/dashboard" element={<AppLayout />} />
+    </Route>
+  </Route>
+</Routes>
+```
 
-`Topbar` and `CreateTaskModal` render **outside** `<Routes>` in `App.tsx`, so they
-persist across route changes. When adding a route, add a `<Route>` here and put the
-container in `layouts/`.
+| Path         | Element      | Guard            | Purpose                          |
+| ------------ | ------------ | ---------------- | -------------------------------- |
+| `/`          | `AuthLayout` | `PublicRoute`    | Login / signup (toggle in-place) |
+| `/dashboard` | `AppLayout`  | `ProtectedRoute` | Sidebar + TaskList + Timer       |
+
+The guards (`components/session/`) each render an `Outlet` or redirect:
+
+- **`SessionGuard`** — on first mount with no token, silently calls `authApi.refreshSession()` (the refresh cookie is sent automatically) and stores the returned token. Renders a loading state while checking, then the `Outlet`. Runs once per mount; a failed refresh simply leaves the user logged out.
+- **`PublicRoute`** — redirects logged-in users to `/dashboard`.
+- **`ProtectedRoute`** — redirects logged-out users to `/`.
+
+`Topbar` and `CreateTaskModal` render **outside** the route table in `App.tsx`, so they persist across route changes. To add a route: create the container in `layouts/`, register a `<Route>` in `routes/app-routes.tsx` under the appropriate guard.
 
 ## State management (Redux Toolkit)
 
@@ -131,14 +158,11 @@ rootReducer = { auth, tasks }
 ```
 
 - **`auth`** (`IAuthState`): `isLoggedIn`, `token`, `user`, `status`, `error`.
-  Reducers: `setToken`, `clearToken`.
+  Reducers: `setToken` (also sets `isLoggedIn: true`), `clearToken` (resets token, login flag, user, and status).
 - **`tasks`** (`ITasksState`): `items: ITask[]`, `status: 'idle' | 'loading' | 'error'`, `error`.
   Reducers: `setTasks`, `addTask`, `setStatus`.
 
-**Convention — reducers live in `store/reducer/`, not inline in the slice.** Each slice
-imports a plain reducer map (`reducers: taskReducer`) from `store/reducer/`. This keeps
-slices thin and reducers individually testable. Reducers are written as pure functions
-returning a new state object (`return { ...state, … }`) rather than mutating Immer drafts.
+**Convention — reducers live in `store/reducer/`, not inline in the slice.** Each slice imports a plain reducer map (`reducers: taskReducer`) from `store/reducer/`. This keeps slices thin and reducers individually testable. Reducers are written as pure functions returning a new state object (`return { ...state, … }`) rather than mutating Immer drafts.
 
 **Always use the typed hooks** from `store/store.ts` — never the raw `react-redux` ones:
 
@@ -149,27 +173,25 @@ const dispatch = useAppDispatch();
 const tasks = useAppSelector((s) => s.tasks.items);
 ```
 
-Action creators are re-exported as namespaced bundles from `@/store`
-(`authActions`, `taskActions`) so call sites read as `dispatch(taskActions.setTasks(...))`.
+Action creators are re-exported as namespaced bundles from `@/store` (`authActions`, `taskActions`), so call sites read as `dispatch(taskActions.setTasks(...))`.
 
 ## API layer
 
-`api/client.ts` exports a single configured axios instance (`baseURL: http://localhost:8080`,
-`withCredentials: true`) with two interceptors:
+`api/client.ts` exports a single configured axios instance (`baseURL: http://localhost:8080`, `withCredentials: true`) with two interceptors:
 
-- **Request** — reads `store.getState().auth.token` and sets the `Authorization` header.
-- **Response** — on `401`, calls `GET /auth/refresh`, stores the new token via
-  `authActions.setToken`, and **replays the original request once**. If refresh fails it
-  rethrows. (Note: a 401 on the refresh call itself is not retried.)
+- **Request** — reads `store.getState().auth.token` and, when present, sets the `Authorization: Bearer` header.
+- **Response** — on a `401`, calls `GET /auth/refresh`, stores the new token via `authActions.setToken`, and **replays the original request once** (a `_retry` flag prevents loops, and the refresh endpoint itself is never retried). If the refresh fails, the interceptor dispatches `authActions.clearToken` and rethrows.
 
-Per-domain modules (`task.api.ts`) import this client and expose functions that return the
-**parsed response data**, not the axios response:
+Per-domain modules import this client and expose functions that return the **parsed response data**, not the axios response:
+
+- **`auth.api.ts`** — `initateLogin(payload)` posts to `/auth/login`; `refreshSession()` gets `/auth/refresh`.
+- **`task.api.ts`** — `getTasks()` and friends:
 
 ```ts
 export const getTasks = () => client.get<ITask[]>('/task').then((r) => r.data);
 ```
 
-Components and layouts never import `client` directly — they go through a hook.
+Components and layouts never import `client` directly — they go through a hook (or, for the session components, the `authApi` module).
 
 ## Data flow (worked example: loading tasks)
 
@@ -185,29 +207,29 @@ AppLayout (useEffect)                          ── mount
   → tasks.map(toTaskListItem) → <TaskList>
 ```
 
-`toTaskListItem` in `layouts/app.tsx` adapts the server `ITask` into the view model
-`TaskListItem` that presentational components expect (status grouping, flag colour, etc.).
-This adapter boundary keeps the API shape decoupled from component props.
+`toTaskListItem` in `layouts/app.tsx` adapts the server `ITask` into the view model `TaskListItem` that presentational components expect (status grouping, flag colour, etc.). This adapter boundary keeps the API shape decoupled from component props.
+
+### Login flow
+
+```
+LoginForm (Sign in)
+  → authApi.initateLogin({ email, password })   ── POST /auth/login (sets refresh cookie)
+  → dispatch(authActions.setToken(token))       ── isLoggedIn: true
+  → navigate('/dashboard')                      ── ProtectedRoute now passes
+```
+
+On a full page reload, `SessionGuard` restores the session from the refresh cookie before rendering any route.
 
 ## Theme system
 
-`global.css` defines all design tokens as CSS custom properties under `:root` (light) and
-`.dark`, in the OKLCH color space. `App.tsx` holds the `isDark` boolean and toggles the
-`.dark` class on the root `<div>`; `Topbar` exposes the toggle via `onToggleTheme`. The
-brand color is `--brand: oklch(0.62 0.17 28)` (orange).
+`global.css` defines all design tokens as CSS custom properties under `:root` (light) and `.dark`, in the OKLCH color space. `App.tsx` holds the `isDark` boolean and toggles the `.dark` class on the root `<div>`; `Topbar` exposes the toggle via `onToggleTheme`. The brand color is `--brand: oklch(0.62 0.17 28)` (orange).
 
 ## Component conventions
 
-- **Base components** (`components/base/`) wrap Radix UI primitives with Tailwind classes and
-  `data-slot` attributes. `Button` uses CVA for `variant` and `size`. Barrel-exported from
-  `components/base/index.ts`.
-- **Feature components** compose base components with domain logic. They are **named exports**
-  and barrel-exported from `components/index.ts`.
-- **Layouts** are **default exports** and serve as route-level containers; the barrel renames
-  `AuthenticationLayout → AuthLayout`.
-- **Forms** (`LoginForm`, `SignupForm`, `CreateTaskModal`) are currently controlled by local
-  `useState`. Auth forms have **no submission handler wired to the API yet** — this is the
-  natural next integration point (dispatch `authActions` + an `auth.api` module).
+- **Base components** (`components/base/`) wrap Radix UI primitives with Tailwind classes and `data-slot` attributes. `Button` uses CVA for `variant` and `size`. Barrel-exported from `components/base/index.ts`.
+- **Feature components** compose base components with domain logic. They are **named exports**, barrel-exported from `components/index.ts`.
+- **Layouts** are **default exports** and serve as route-level containers; the barrel renames `AuthenticationLayout → AuthLayout`.
+- **Forms** (`LoginForm`, `SignupForm`, `CreateTaskModal`) are controlled by local `useState`. `LoginForm` is wired to `authApi.initateLogin`; `SignupForm` has **no submission handler yet** — wiring it to a register endpoint is the natural next integration point.
 
 ## Key component props
 
@@ -231,8 +253,7 @@ brand color is `--brand: oklch(0.62 0.17 28)` (orange).
 
 ### `TaskList`
 
-Accepts `tasks: TaskListItem[]` and groups them into **To Do**, **In Progress**, and **Done**
-sections. Empty groups are hidden. Returns `null` when all groups are empty.
+Accepts `tasks: TaskListItem[]` and groups them into **To Do**, **In Progress**, and **Done** sections. Empty groups are hidden. Returns `null` when all groups are empty.
 
 ### `Task`
 
@@ -255,31 +276,25 @@ sections. Empty groups are hidden. Returns `null` when all groups are empty.
 | `onClose`  | `() => void`              | resets form + closes                   |
 | `onSubmit` | `(task: NewTask) => void` | fires on valid submit (title required) |
 
-`NewTask` = `{ title; description?; dueDate?; project? }`. Submission is gated on a non-empty
-trimmed `title`.
+`NewTask` = `{ title; description?; dueDate?; project? }`. Submission is gated on a non-empty trimmed `title`.
 
 ### `LoginForm` / `SignupForm`
 
-Controlled form components managing their own `useState`. No submission handler yet — API
-integration is pending. `SignupForm` fields: full name · email · password (toggle) · confirm
-password (toggle).
+Controlled form components managing their own `useState`. `LoginForm` submits via `authApi.initateLogin`, stores the token, and navigates to `/dashboard`. `SignupForm` (full name · email · password · confirm password, with visibility toggles) is not yet wired to the API.
 
 ## How to contribute
 
 Pick the layer that matches the change and follow its established pattern:
 
-- **Add a new screen/route** → create a container in `layouts/`, export it from
-  `layouts/index.ts`, and register a `<Route>` in `App.tsx`.
+- **Add a new screen/route** → create a container in `layouts/`, export it from `layouts/index.ts`, and register a `<Route>` in `routes/app-routes.tsx` under `PublicRoute` or `ProtectedRoute` as appropriate.
 - **Add a new server resource (e.g. projects)**:
   1. Add the domain type in `types/`.
   2. Add an `api/<domain>.api.ts` module that uses `client` and returns parsed data; export it from `api/index.ts`.
   3. Add a slice in `store/slice/` + a reducer map in `store/reducer/`; wire it into `rootReducer`.
   4. Add a `hooks/use<Domain>.ts` that selects state and exposes async actions.
   5. Consume the hook from a layout/component — **never call axios or dispatch sequences from a component**.
-- **Add UI** → reuse `components/base/`; only add a new base primitive if Radix offers one and
-  it's genuinely reusable. Feature components are named exports via `components/index.ts`.
-- **Touch state** → reducers go in `store/reducer/` as pure functions; access state only through
-  the typed `useAppSelector` / `useAppDispatch` hooks and namespaced `*Actions`.
+- **Add UI** → reuse `components/base/`; only add a new base primitive if Radix offers one and it's genuinely reusable. Feature components are named exports via `components/index.ts`.
+- **Touch state** → reducers go in `store/reducer/` as pure functions; access state only through the typed `useAppSelector` / `useAppDispatch` hooks and namespaced `*Actions`.
 
 ### House rules
 
@@ -291,14 +306,10 @@ Pick the layer that matches the change and follow its established pattern:
 ## Testing
 
 - Test files: `*.spec.ts` / `*.spec.tsx` — **never `.test.ts`**.
-- Most tests live under `src/__tests__/**` mirroring `src/`; a few are co-located in
-  `__tests__/` next to the component.
+- Most tests live under `src/__tests__/**` mirroring `src/`; a few are co-located in `__tests__/` next to the component (`topbar`, `session`).
 - Runner: `jest --config jest.config.cjs`.
-- CSS imports are stubbed via `moduleNameMapper` → `src/__mocks__/styleMock.js`.
-- Path alias `@/` maps to `src/` in both `tsconfig.json` and `jest.config.cjs`.
-- Coverage target: **100%** statements, branches, functions, lines. Write the **minimum**
-  cases to hit it, and always include an error/rejection case for any path that can throw
-  (e.g. the 401-refresh branch in `api/client.ts`).
+- `moduleNameMapper` stubs CSS imports (`src/__mocks__/styleMock.js`) and `react-router` (`src/__mocks__/reactRouterMock.tsx`), and maps the `@/` alias to `src/`.
+- Coverage target: **100%** statements, branches, functions, lines. Write the **minimum** cases to hit it, and always include an error/rejection case for any path that can throw (e.g. the 401-refresh branch in `api/client.ts`).
 
 ```bash
 pnpm test              # run all tests
