@@ -21,19 +21,19 @@ const controller = new TaskController(
 );
 const router: Router = express.Router();
 
-router.get(
-  '/',
-  (req: Request, res: Response, next: NextFunction) => sessionMiddleware.handle(req, res, next),
-  async (request: Request, response: Response, next: NextFunction) => {
-    try {
-      const userId = response.locals.user.userId as string;
-      const result = await controller.getByUser({ params: { userId } });
-      response.send(result);
-    } catch (err) {
-      next(err);
-    }
-  },
+router.use((req: Request, res: Response, next: NextFunction) =>
+  sessionMiddleware.handle(req, res, next),
 );
+
+router.get('/', async (_request: Request, response: Response, next: NextFunction) => {
+  try {
+    const userId = response.locals.user.userId as string;
+    const result = await controller.getByUser({ params: { userId } });
+    response.send(result);
+  } catch (err) {
+    next(err);
+  }
+});
 
 router.post('/create', async (request: Request, response: Response, next: NextFunction) => {
   try {
