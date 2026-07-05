@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { Provider } from 'react-redux';
 import App from '@/App';
+import { store } from '@/store';
 
 jest.mock('react-router', () => ({
   Routes: () => null,
@@ -24,25 +26,33 @@ jest.mock('@/components', () => ({
   CreateTaskModal: () => null,
 }));
 
+function renderApp() {
+  return render(
+    <Provider store={store}>
+      <App />
+    </Provider>,
+  );
+}
+
 describe('App', () => {
   it('renders in dark mode by default', () => {
-    const { container } = render(<App />);
+    const { container } = renderApp();
     expect(container.firstChild).toHaveClass('dark');
   });
 
   it('renders the topbar', () => {
-    render(<App />);
+    renderApp();
     expect(screen.getByTestId('topbar-toggle')).toBeInTheDocument();
   });
 
   it('switches to light mode when onToggleTheme is called with false', () => {
-    const { container } = render(<App />);
+    const { container } = renderApp();
     fireEvent.click(screen.getByTestId('topbar-toggle'));
     expect(container.firstChild).toHaveClass('light');
   });
 
   it('switches back to dark mode when onToggleTheme is called with true', () => {
-    const { container } = render(<App />);
+    const { container } = renderApp();
     fireEvent.click(screen.getByTestId('topbar-toggle'));
     fireEvent.click(screen.getByTestId('topbar-toggle'));
     expect(container.firstChild).toHaveClass('dark');

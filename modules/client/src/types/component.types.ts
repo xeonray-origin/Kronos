@@ -6,6 +6,7 @@ export interface TopbarProps {
   onAddTask?: () => void;
   onToggleTheme: (value: boolean) => void;
   isDark?: boolean;
+  isLoggedIn?: boolean;
 }
 
 export interface TimerProps {

@@ -9,6 +9,7 @@ export function Topbar({
   onAddTask,
   onToggleTheme,
   isDark = true,
+  isLoggedIn = false,
 }: TopbarProps) {
   const handleToggleTheme = () => onToggleTheme(!isDark);
 
@@ -21,20 +22,24 @@ export function Topbar({
           </div>
           <span className="text-lg font-bold text-foreground">{appName}</span>
         </div>
-        <Button variant="outline" size="sm" onClick={onAddTask}>
-          <Plus className="size-4" />
-          Add task
-        </Button>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleToggleTheme}
-            aria-label="Toggle theme"
-          >
-            {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+        {isLoggedIn && (
+          <Button variant="outline" size="sm" onClick={onAddTask}>
+            <Plus className="size-4" />
+            Add task
           </Button>
-        </div>
+        )}
+        {isLoggedIn && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleToggleTheme}
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            </Button>
+          </div>
+        )}
       </div>
     </header>
   );

@@ -22,14 +22,14 @@ describe('Topbar', () => {
       expect(screen.getByText('MyApp')).toBeInTheDocument();
     });
 
-    it('renders the Add task button', () => {
-      render(<Topbar onToggleTheme={onToggleTheme} />);
+    it('renders the Add task button when logged in', () => {
+      render(<Topbar onToggleTheme={onToggleTheme} isLoggedIn={true} />);
 
       expect(screen.getByText('Add task')).toBeInTheDocument();
     });
 
-    it('renders the theme toggle button', () => {
-      render(<Topbar onToggleTheme={onToggleTheme} />);
+    it('renders the theme toggle button when logged in', () => {
+      render(<Topbar onToggleTheme={onToggleTheme} isLoggedIn={true} />);
 
       expect(screen.getByLabelText('Toggle theme')).toBeInTheDocument();
     });
@@ -39,13 +39,25 @@ describe('Topbar', () => {
 
       expect(screen.getByText('T')).toBeInTheDocument();
     });
+
+    it('hides the Add task button when logged out', () => {
+      render(<Topbar onToggleTheme={onToggleTheme} isLoggedIn={false} />);
+
+      expect(screen.queryByText('Add task')).not.toBeInTheDocument();
+    });
+
+    it('hides the theme toggle button when logged out', () => {
+      render(<Topbar onToggleTheme={onToggleTheme} isLoggedIn={false} />);
+
+      expect(screen.queryByLabelText('Toggle theme')).not.toBeInTheDocument();
+    });
   });
 
   describe('interactions', () => {
     it('calls onAddTask when Add task button is clicked', () => {
       const onAddTask = jest.fn();
 
-      render(<Topbar onAddTask={onAddTask} onToggleTheme={onToggleTheme} />);
+      render(<Topbar onAddTask={onAddTask} onToggleTheme={onToggleTheme} isLoggedIn={true} />);
 
       fireEvent.click(screen.getByText('Add task'));
 
@@ -53,7 +65,7 @@ describe('Topbar', () => {
     });
 
     it('calls onToggleTheme with false when isDark is true', () => {
-      render(<Topbar onToggleTheme={onToggleTheme} isDark={true} />);
+      render(<Topbar onToggleTheme={onToggleTheme} isDark={true} isLoggedIn={true} />);
 
       fireEvent.click(screen.getByLabelText('Toggle theme'));
 
@@ -61,7 +73,7 @@ describe('Topbar', () => {
     });
 
     it('calls onToggleTheme with true when isDark is false', () => {
-      render(<Topbar onToggleTheme={onToggleTheme} isDark={false} />);
+      render(<Topbar onToggleTheme={onToggleTheme} isDark={false} isLoggedIn={true} />);
 
       fireEvent.click(screen.getByLabelText('Toggle theme'));
 
