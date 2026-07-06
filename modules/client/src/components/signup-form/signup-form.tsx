@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { Button, Card, CardContent, Input } from '@/components/base';
+import { authApi } from '@/api';
+import { useNavigate } from 'react-router';
 
 function GoogleIcon() {
   return (
@@ -28,10 +30,28 @@ function GoogleIcon() {
 export function SignupForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async () => {
+    try {
+      const [firstName, ...rest] = name.trim().split(/\s+/);
+      const lastName = rest.join(' ');
+      await authApi.initiateRegister({
+        name: { firstName: firstName!, lastName },
+        email,
+        phoneNumber,
+        password,
+        confirmPassword,
+        role: 'user',
+      });
+      navigate('/');
+    } catch (e) {}
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -66,6 +86,16 @@ export function SignupForm() {
             placeholder="alex@company.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-foreground">Phone number</label>
+          <Input
+            type="tel"
+            placeholder="+1 555 123 4567"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
           />
         </div>
 
@@ -117,7 +147,8 @@ export function SignupForm() {
 
         <Button
           className="w-full h-10 bg-foreground text-background hover:bg-foreground/85"
-          type="submit"
+          type="button"
+          onClick={handleSubmit}
         >
           Sign up
         </Button>

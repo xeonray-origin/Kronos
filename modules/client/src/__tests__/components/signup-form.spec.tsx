@@ -1,5 +1,12 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SignupForm } from '@/components';
+import { authApi } from '@/api';
+
+jest.mock('@/api', () => ({
+  authApi: {
+    initiateRegister: jest.fn(),
+  },
+}));
 
 describe('SignupForm', () => {
   describe('rendering', () => {
@@ -30,9 +37,75 @@ describe('SignupForm', () => {
       expect(screen.getByText('Confirm password')).toBeInTheDocument();
     });
 
+    it('renders the phone number input with label and placeholder', () => {
+      render(<SignupForm />);
+      expect(screen.getByText('Phone number')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('+1 555 123 4567')).toBeInTheDocument();
+    });
+
     it('renders the sign up button', () => {
       render(<SignupForm />);
       expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
+    });
+  });
+
+  describe('phone number input', () => {
+    it('updates value on change', () => {
+      render(<SignupForm />);
+      const input = screen.getByPlaceholderText('+1 555 123 4567') as HTMLInputElement;
+      fireEvent.change(input, { target: { value: '5551234567' } });
+      expect(input.value).toBe('5551234567');
+    });
+  });
+
+  describe('submit', () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('calls initiateRegister with the split name and form values on submit', async () => {
+      (authApi.initiateRegister as jest.Mock).mockResolvedValue({});
+      render(<SignupForm />);
+
+      fireEvent.change(screen.getByPlaceholderText('Alex Johnson'), {
+        target: { value: 'Jane Doe' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('alex@company.com'), {
+        target: { value: 'jane@example.com' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('+1 555 123 4567'), {
+        target: { value: '5551234567' },
+      });
+      const [passwordInput, confirmInput] = screen.getAllByPlaceholderText('••••••••') as [
+        HTMLInputElement,
+        HTMLInputElement,
+      ];
+      fireEvent.change(passwordInput, { target: { value: 'secret123' } });
+      fireEvent.change(confirmInput, { target: { value: 'secret123' } });
+
+      fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
+
+      await waitFor(() => {
+        expect(authApi.initiateRegister).toHaveBeenCalledWith({
+          name: { firstName: 'Jane', lastName: 'Doe' },
+          email: 'jane@example.com',
+          phoneNumber: '5551234567',
+          password: 'secret123',
+          confirmPassword: 'secret123',
+          role: 'user',
+        });
+      });
+    });
+
+    it('does not throw when initiateRegister rejects', async () => {
+      (authApi.initiateRegister as jest.Mock).mockRejectedValue(new Error('failed'));
+      render(<SignupForm />);
+
+      fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
+
+      await waitFor(() => {
+        expect(authApi.initiateRegister).toHaveBeenCalled();
+      });
     });
   });
 
