@@ -1,21 +1,7 @@
 import React, { useEffect } from 'react';
 import { Sidebar, TaskList, Timer } from '@/components';
 import { useTasks } from '@/hooks/useTasks';
-import type { ITask, TaskListItem } from '@/types';
-
-function toTaskListItem(task: ITask): TaskListItem {
-  return {
-    id: task._id,
-    status: 'todo',
-    title: task.title,
-    dueDate: task.dueDate,
-    label: task.label,
-    project: task.project,
-    priority: task.priority,
-    showTimer: true,
-    flagColor: 'gray',
-  };
-}
+import type { ITask } from '@/types';
 
 export default function AppLayout() {
   const { tasks, fetchTasks } = useTasks();
@@ -30,7 +16,7 @@ export default function AppLayout() {
         <Sidebar />
       </div>
       <div className="grow p-16">
-        <TaskList tasks={tasks.map(toTaskListItem)} />
+        <TaskList tasks={tasks} />
       </div>
       <div
         className="hidden lg:block float-right h-dvh

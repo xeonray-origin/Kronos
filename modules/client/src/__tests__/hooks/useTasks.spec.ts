@@ -4,13 +4,13 @@ import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { taskSlice } from '@/store/slice/task.slice';
 import { authSlice } from '@/store/slice/auth.slice';
-import type { ITasksState } from '@/types';
+import { TaskStatus, type ITasksState } from '@/types';
 import { useTasks } from '@/hooks/useTasks';
 
 jest.mock('@/api/task.api');
 import { getTasks } from '@/api/task.api';
 
-const MOCK_TASK = { _id: '1', title: 'Task', userId: 'u1' };
+const MOCK_TASK = { _id: '1', title: 'Task', userId: 'u1', status: TaskStatus.TODO };
 
 function makeWrapper(tasksState?: Partial<ITasksState>) {
   const store = configureStore({

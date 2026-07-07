@@ -23,6 +23,11 @@ const taskSchema = new Schema(
     project: {
       type: String,
     },
+    status: {
+      type: String,
+      enum: ['TODO', 'IN-PROGRESS', 'DONE', 'BACKLOG'],
+      default: 'BACKLOG',
+    },
     userId: {
       type: Types.ObjectId,
       ref: 'User',

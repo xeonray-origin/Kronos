@@ -10,4 +10,5 @@ export class Task extends Entity<Task> {
   priority?: string;
   project?: string;
   userId!: Types.ObjectId;
+  status!: 'TODO' | 'IN-PROGRESS' | 'DONE' | 'BACKLOG';
 }

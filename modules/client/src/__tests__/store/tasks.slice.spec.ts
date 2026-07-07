@@ -1,11 +1,11 @@
 import { taskSlice } from '@/store/slice/task.slice';
-import type { ITasksState } from '@/types';
+import { TaskStatus, type ITasksState } from '@/types';
 
 const reducer = taskSlice.reducer;
 const { setTasks, addTask, setStatus } = taskSlice.actions;
 
-const MOCK_TASK = { _id: '1', title: 'Task', userId: 'u1' };
-const MOCK_TASK_2 = { _id: '2', title: 'Second', userId: 'u1' };
+const MOCK_TASK = { _id: '1', title: 'Task', userId: 'u1', status: TaskStatus.TODO };
+const MOCK_TASK_2 = { _id: '2', title: 'Second', userId: 'u1', status: TaskStatus.TODO };
 
 const initialState: ITasksState = { items: [], status: 'idle', error: null };
 

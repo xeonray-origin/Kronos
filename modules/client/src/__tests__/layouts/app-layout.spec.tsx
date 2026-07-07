@@ -1,9 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import AppLayout from '@/layouts/app';
+import { TaskStatus, type ITask } from '@/types';
 
-const MOCK_TASK = { _id: '1', title: 'Review pull request #482', userId: 'u1' };
+const MOCK_TASK: ITask = {
+  id: '1',
+  status: TaskStatus.TODO,
+  title: 'Review pull request #482',
+  userId: 'u1',
+};
 
-let mockTasks: (typeof MOCK_TASK)[] = [];
+let mockTasks: ITask[] = [];
 
 jest.mock('@/hooks/useTasks', () => ({
   useTasks: () => ({

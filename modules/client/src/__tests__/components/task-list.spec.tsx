@@ -1,13 +1,31 @@
 import { render, screen } from '@testing-library/react';
 import { TaskList } from '@/components';
+import { TaskStatus, type ITask } from '@/types';
 
 jest.mock('@/hooks/useTasks', () => ({
   useTasks: () => ({ tasks: [], error: null, fetchTasks: jest.fn() }),
 }));
 
-const TODO_TASK = { id: '1', status: 'todo' as const, title: 'Write docs' };
-const IN_PROGRESS_TASK = { id: '2', status: 'in-progress' as const, title: 'Fix bug' };
-const DONE_TASK = { id: '3', status: 'done' as const, title: 'Ship feature', completed: true };
+const TODO_TASK: ITask = { id: '1', status: TaskStatus.TODO, title: 'Write docs', userId: 'u1' };
+const IN_PROGRESS_TASK: ITask = {
+  id: '2',
+  status: TaskStatus.IN_PROGRESS,
+  title: 'Fix bug',
+  userId: 'u1',
+};
+const DONE_TASK: ITask = {
+  id: '3',
+  status: TaskStatus.DONE,
+  title: 'Ship feature',
+  userId: 'u1',
+  isCompleted: true,
+};
+const BACKLOG_TASK: ITask = {
+  id: '5',
+  status: TaskStatus.BACKLOG,
+  title: 'Backlog item',
+  userId: 'u1',
+};
 
 describe('TaskList', () => {
   it('renders nothing when tasks array is empty', () => {
@@ -46,5 +64,12 @@ describe('TaskList', () => {
 
     expect(screen.getByText('Write docs')).toBeInTheDocument();
     expect(screen.getByText('Fix bug')).toBeInTheDocument();
+  });
+
+  it('excludes backlog tasks from all groups', () => {
+    render(<TaskList tasks={[TODO_TASK, BACKLOG_TASK]} />);
+
+    expect(screen.getByText('Write docs')).toBeInTheDocument();
+    expect(screen.queryByText('Backlog item')).not.toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import type { NewTask, TaskFlagColor, TaskListItem, TaskPriority } from './task.types';
+import type { CreateTaskInput, ITask } from './task.types';
 
 export interface TopbarProps {
   appName?: string;
@@ -37,24 +37,13 @@ export interface SidebarProps {
 export interface CreateTaskModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (task: NewTask) => void;
+  onSubmit: (task: CreateTaskInput) => void;
 }
 
-export interface TaskProps {
-  title: string;
-  dueDate?: string;
-  dueDateMuted?: boolean;
-  label?: string;
-  labels?: string[];
-  project?: string;
-  description?: string;
-  priority?: TaskPriority;
-  completed?: boolean;
-  progress?: { filled: number; total: number };
-  flagColor?: TaskFlagColor;
-  showTimer?: boolean;
+export interface TaskProps extends Omit<ITask, 'id'> {
+  handleTimer?: (taskId: string) => void;
 }
 
 export interface TaskListProps {
-  tasks: TaskListItem[];
+  tasks: ITask[];
 }

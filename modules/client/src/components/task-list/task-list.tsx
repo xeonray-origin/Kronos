@@ -1,26 +1,30 @@
 import { Task } from '@/components/task';
 import { cn } from '@/lib/utils';
-import type { TaskListItem, TaskListProps, TaskStatus } from '@/types';
+import { TaskStatus } from '@/types';
+import type { ITask, TaskListProps, TaskStatusType } from '@/types';
 
-const GROUPS: { status: TaskStatus; label: string; dotClass: string }[] = [
-  { status: 'todo', label: 'To Do', dotClass: 'bg-muted-foreground' },
-  { status: 'in-progress', label: 'In Progress', dotClass: 'bg-amber-500' },
-  { status: 'done', label: 'Done', dotClass: 'bg-emerald-500' },
+const GROUPS: { status: TaskStatusType; label: string; dotClass: string }[] = [
+  { status: TaskStatus.TODO, label: 'To Do', dotClass: 'bg-muted-foreground' },
+  { status: TaskStatus.IN_PROGRESS, label: 'In Progress', dotClass: 'bg-amber-500' },
+  { status: TaskStatus.DONE, label: 'Done', dotClass: 'bg-emerald-500' },
 ];
 
 export function TaskList({ tasks }: TaskListProps) {
-  const grouped = tasks.reduce<Record<TaskStatus, TaskListItem[]>>(
+  const grouped = tasks.reduce<Record<TaskStatusType, ITask[]>>(
     (acc, task) => {
-      acc[task.status].push(task);
+      if (task.status !== TaskStatus.BACKLOG) {
+        acc[task.status].push(task);
+      }
       return acc;
     },
-    { todo: [], 'in-progress': [], done: [] },
+    { [TaskStatus.TODO]: [], [TaskStatus.IN_PROGRESS]: [], [TaskStatus.DONE]: [] },
   );
 
   const activeGroups = GROUPS.filter((g) => grouped[g.status].length > 0);
 
   if (activeGroups.length === 0) return null;
 
+  const handleOnClickTimer = (taskId: string) => console.log(`Start timer for task ${taskId}`);
   return (
     <div className="flex flex-col gap-6">
       {activeGroups.map((g) => (
@@ -31,8 +35,8 @@ export function TaskList({ tasks }: TaskListProps) {
             <span className="text-sm text-muted-foreground">{grouped[g.status].length}</span>
           </div>
           <div className="rounded-xl border border-border bg-background divide-y divide-border overflow-hidden">
-            {grouped[g.status].map(({ id, status, ...rest }) => (
-              <Task key={id} {...rest} />
+            {grouped[g.status].map(({ id, ...rest }) => (
+              <Task key={id} handleTimer={handleOnClickTimer} {...rest} />
             ))}
           </div>
         </section>
