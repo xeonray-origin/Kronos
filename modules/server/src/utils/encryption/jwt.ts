@@ -1,12 +1,13 @@
 import { IJwtToken, JwtTokenPayload } from '@/interfaces';
+import { appConfig } from '@/config';
 import crypto from 'crypto';
 
 export class JWTToken implements IJwtToken {
   secretKey: string;
   refreshSecretKey: string;
   constructor() {
-    this.secretKey = process.env.JWT_SECRET || 'your_super_secret_key';
-    this.refreshSecretKey = process.env.JWT_REFRESH_SECRET || 'your_super_refresh_secret_key';
+    this.secretKey = appConfig.jwtSecret;
+    this.refreshSecretKey = appConfig.jwtRefreshSecret;
   }
   public async base64UrlEncode(payload: string) {
     return Buffer.from(payload)

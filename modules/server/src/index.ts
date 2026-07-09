@@ -1,12 +1,14 @@
+import 'dotenv/config';
 import express, { Express } from 'express';
 import cors from 'cors';
 import routes from '@/routes';
 import methodOverride from 'method-override';
 import { IError } from '@/interfaces';
+import { appConfig } from '@/config';
 import { default as cookieParser } from 'cookie-parser';
 
 const app: Express = express();
-const port = process.env['PORT'] ?? 8080;
+const port = appConfig.port;
 
 const METHODS_ALLOWED = 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS';
 

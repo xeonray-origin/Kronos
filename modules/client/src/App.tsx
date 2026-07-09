@@ -9,7 +9,6 @@ export default function App() {
   const [isDark, setDarkMode] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
-
   return (
     <div className={cn(isDark ? 'dark' : 'light')}>
       <div className="h-dvh bg-background overflow-y-hidden">

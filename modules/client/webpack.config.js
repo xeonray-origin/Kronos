@@ -1,6 +1,8 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import Dotenv from 'dotenv-webpack';
+import webpack from 'webpack';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -32,7 +34,13 @@ export default (_env, argv) => ({
     path: path.resolve(__dirname, 'dist'),
     clean: true,
   },
-  plugins: [new HtmlWebpackPlugin({ template: './public/index.html' })],
+  plugins: [
+    new HtmlWebpackPlugin({ template: './public/index.html' }),
+    new Dotenv({ silent: true, systemvars: true }),
+    new webpack.DefinePlugin({
+      'process.env.ENV': JSON.stringify(argv.mode ?? 'development'),
+    }),
+  ],
   devServer: {
     port: 3000,
     hot: true,

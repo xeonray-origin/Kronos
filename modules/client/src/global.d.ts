@@ -5,4 +5,5 @@ declare global {
     React: typeof ReactType;
   }
   var React: typeof ReactType;
+  var process: { env: { ENV?: string; API_BASE_URL?: string } };
 }
