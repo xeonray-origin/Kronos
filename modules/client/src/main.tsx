@@ -6,7 +6,7 @@ import { store } from '@/store';
 import { Provider } from 'react-redux';
 
 async function enableMocking() {
-  if (process.env.ENV !== 'development') {
+  if (process.env.USE_MOCK !== 'true') {
     return;
   }
   const { worker } = await import('./mock-server/browser');

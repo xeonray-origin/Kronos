@@ -8,6 +8,7 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["jest", "@testing-library/jest-dom"],
     "noEmit": false,
+    "resolveJsonModule": true,
     "rootDir": "src",
     "paths": {
       "@/*": ["./src/*"]

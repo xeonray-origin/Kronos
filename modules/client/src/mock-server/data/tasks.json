@@ -1,0 +1,55 @@
+[
+  {
+    "id": "task-1",
+    "status": "TODO",
+    "userId": "mock-user-id",
+    "title": "Draft Q3 product roadmap",
+    "description": "Outline the key initiatives and milestones for the next quarter.",
+    "dueDate": "Jul 18",
+    "label": "planning",
+    "project": "Roadmap",
+    "isCompleted": false
+  },
+  {
+    "id": "task-2",
+    "status": "TODO",
+    "userId": "mock-user-id",
+    "title": "Review pull request #142",
+    "description": "Check the mock server toggle implementation.",
+    "label": "code-review",
+    "project": "Kronos",
+    "isCompleted": false
+  },
+  {
+    "id": "task-3",
+    "status": "IN-PROGRESS",
+    "userId": "mock-user-id",
+    "title": "Implement task dashboard UI",
+    "description": "Build the grouped task list with status sections.",
+    "dueDate": "Jul 14",
+    "label": "frontend",
+    "project": "Dashboard",
+    "isCompleted": false
+  },
+  {
+    "id": "task-4",
+    "status": "IN-PROGRESS",
+    "userId": "mock-user-id",
+    "title": "Wire up authentication refresh flow",
+    "description": "Handle 401 responses with silent token refresh.",
+    "label": "auth",
+    "project": "Kronos",
+    "isCompleted": false
+  },
+  {
+    "id": "task-5",
+    "status": "DONE",
+    "userId": "mock-user-id",
+    "title": "Set up MSW mock server",
+    "description": "Add in-browser request mocking for local development.",
+    "dueDate": "Jul 10",
+    "label": "tooling",
+    "project": "Kronos",
+    "isCompleted": true
+  }
+]

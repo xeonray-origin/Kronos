@@ -4,9 +4,11 @@ import type {
   IRefreshResponse,
   IRegisterPayload,
   IRegisterResponse,
+  ITask,
 } from '@/types';
+import tasks from './data/tasks.json';
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = process.env.API_BASE_URL ?? 'http://localhost:8000';
 
 export const handlers = [
   http.post(`${BASE_URL}/auth/login`, () =>
@@ -31,4 +33,6 @@ export const handlers = [
       role,
     });
   }),
+
+  http.get(`${BASE_URL}/task`, () => HttpResponse.json<ITask[]>(tasks as ITask[])),
 ];
