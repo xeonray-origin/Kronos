@@ -10,19 +10,20 @@ describe('Task', () => {
     expect(screen.getByRole('button', { name: 'Complete task' })).toBeInTheDocument();
   });
 
-  it('renders dueDate and project when provided', () => {
+  it('renders dueDate and labels when provided', () => {
     render(
       <Task
         title="Ship feature"
         status={TaskStatus.TODO}
         userId="u1"
         dueDate="Yesterday"
-        project="Inbox"
+        labels={['frontend', 'auth']}
       />,
     );
 
     expect(screen.getByText('Yesterday')).toBeInTheDocument();
-    expect(screen.getByText('Inbox')).toBeInTheDocument();
+    expect(screen.getByText('frontend')).toBeInTheDocument();
+    expect(screen.getByText('auth')).toBeInTheDocument();
   });
 
   it('renders completed state with strikethrough and checkmark', () => {
@@ -45,13 +46,7 @@ describe('Task', () => {
 
   it('renders timer icon when handleTimer is provided', () => {
     const { container } = render(
-      <Task
-        title="Timed task"
-        status={TaskStatus.TODO}
-        userId="u1"
-        project="Inbox"
-        handleTimer={jest.fn()}
-      />,
+      <Task title="Timed task" status={TaskStatus.TODO} userId="u1" handleTimer={jest.fn()} />,
     );
 
     expect(container.querySelector('svg.lucide-clock')).toBeInTheDocument();

@@ -1,6 +1,7 @@
-import { BellIcon, CalendarIcon, CheckIcon, FlagIcon, ClockIcon } from 'lucide-react';
+import { CalendarIcon, CheckIcon, ClockIcon } from 'lucide-react';
 import { Badge } from '@/components/base/badge';
 import { cn } from '@/lib/utils';
+import { labelColor } from '@/lib/labels';
 import type { TaskProps } from '@/types';
 
 const statusColors: Record<string, string> = {
@@ -12,13 +13,13 @@ const statusColors: Record<string, string> = {
 export function Task({
   title,
   dueDate,
-  label,
-  project,
+  labels,
   status,
   isCompleted: completed,
   handleTimer: showTimer,
 }: TaskProps) {
-  const hasRight = dueDate || project;
+  const hasLabels = labels !== undefined && labels.length > 0;
+  const hasRight = dueDate || hasLabels || showTimer;
 
   return (
     <div className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors">
@@ -43,17 +44,20 @@ export function Task({
       </span>
       {hasRight && (
         <div className="flex items-center gap-2 shrink-0">
+          {hasLabels && (
+            <div className="flex items-center gap-1">
+              {labels.map((label) => (
+                <Badge key={label} className={cn('border-transparent', labelColor(label).chip)}>
+                  {label}
+                </Badge>
+              ))}
+            </div>
+          )}
           {dueDate && (
-            <span className={cn('flex items-center gap-1 text-xs', 'text-destructive')}>
+            <span className="flex items-center gap-1 text-xs text-destructive">
               <CalendarIcon className="h-3 w-3" />
               {dueDate}
             </span>
-          )}
-          {project && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span>{project}</span>
-              <BellIcon className="h-3.5 w-3.5" />
-            </div>
           )}
           {showTimer && <ClockIcon className="h-4 w-4 text-muted-foreground" />}
         </div>

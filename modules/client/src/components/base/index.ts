@@ -20,6 +20,7 @@ export {
   CardContent,
 } from './card';
 export { Checkbox } from './checkbox';
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from './popover';
 export {
   Dialog,
   DialogOverlay,

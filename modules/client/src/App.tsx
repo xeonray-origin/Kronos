@@ -1,5 +1,5 @@
 import { Topbar, CreateTaskModal } from '@/components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './global.css';
 import { AppRoutes } from './routes';
 import { cn } from './lib/utils';
@@ -9,6 +9,12 @@ export default function App() {
   const [isDark, setDarkMode] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.classList.toggle('light', !isDark);
+  }, [isDark]);
+
   return (
     <div className={cn(isDark ? 'dark' : 'light')}>
       <div className="h-dvh bg-background overflow-y-hidden">

@@ -7,7 +7,7 @@ export enum TaskStatus {
 
 export type TaskStatusType = TaskStatus.TODO | TaskStatus.IN_PROGRESS | TaskStatus.DONE;
 
-export type CreateTaskInput = Pick<ITask, 'title' | 'description' | 'dueDate' | 'project'>;
+export type CreateTaskInput = Pick<ITask, 'title' | 'description' | 'dueDate' | 'labels'>;
 
 export interface ITask {
   id?: string;
@@ -17,6 +17,6 @@ export interface ITask {
   description?: string;
   dueDate?: string;
   label?: string;
-  project?: string;
+  labels?: string[];
   isCompleted?: boolean;
 }
