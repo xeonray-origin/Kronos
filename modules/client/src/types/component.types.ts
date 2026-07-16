@@ -40,6 +40,11 @@ export interface CreateTaskModalProps {
   onSubmit: (task: CreateTaskInput) => void;
 }
 
+export interface LabelPickerProps {
+  value: string[];
+  onChange: (labels: string[]) => void;
+}
+
 export interface TaskProps extends Omit<ITask, 'id'> {
   handleTimer?: (taskId: string) => void;
 }
