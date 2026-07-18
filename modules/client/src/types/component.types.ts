@@ -45,6 +45,12 @@ export interface LabelPickerProps {
   onChange: (labels: string[]) => void;
 }
 
+export interface DatePickerProps {
+  value?: Date;
+  onChange: (date?: Date) => void;
+  placeholder?: string;
+}
+
 export interface TaskProps extends Omit<ITask, 'id'> {
   handleTimer?: (taskId: string) => void;
 }

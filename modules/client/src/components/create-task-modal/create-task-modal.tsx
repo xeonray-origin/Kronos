@@ -9,13 +9,15 @@ import {
   Input,
 } from '@/components/base';
 import { LabelPicker } from '@/components/label-picker';
+import { DatePicker, formatDatePickerValue } from '@/components/date-picker';
 import type { CreateTaskModalProps } from '@/types';
 
-const EMPTY_FORM = { title: '', description: '', dueDate: '' };
+const EMPTY_FORM = { title: '', description: '' };
 
 export function CreateTaskModal({ open, onClose, onSubmit }: CreateTaskModalProps) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [labels, setLabels] = useState<string[]>([]);
+  const [dueDate, setDueDate] = useState<Date>();
 
   const handleChange =
     (field: keyof typeof EMPTY_FORM) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -24,6 +26,7 @@ export function CreateTaskModal({ open, onClose, onSubmit }: CreateTaskModalProp
   const reset = () => {
     setForm(EMPTY_FORM);
     setLabels([]);
+    setDueDate(undefined);
   };
 
   const handleSubmit: NonNullable<ComponentProps<'form'>['onSubmit']> = (e) => {
@@ -32,7 +35,7 @@ export function CreateTaskModal({ open, onClose, onSubmit }: CreateTaskModalProp
     onSubmit({
       title: form.title.trim(),
       description: form.description || undefined,
-      dueDate: form.dueDate || undefined,
+      dueDate: dueDate ? formatDatePickerValue(dueDate) : undefined,
       labels: labels.length > 0 ? labels : undefined,
     });
     reset();
@@ -83,15 +86,8 @@ export function CreateTaskModal({ open, onClose, onSubmit }: CreateTaskModalProp
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-foreground" htmlFor="task-due-date">
-              Due date
-            </label>
-            <Input
-              id="task-due-date"
-              placeholder="e.g. Today, Tomorrow"
-              value={form.dueDate}
-              onChange={handleChange('dueDate')}
-            />
+            <span className="text-sm font-medium text-foreground">Due date</span>
+            <DatePicker value={dueDate} onChange={setDueDate} />
           </div>
           <div className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-foreground">Labels</span>

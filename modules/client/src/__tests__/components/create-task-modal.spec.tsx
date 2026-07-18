@@ -9,6 +9,10 @@ describe('CreateTaskModal', () => {
     return { onClose, onSubmit };
   };
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('renders nothing when closed', () => {
     setup(false);
     expect(screen.queryByText('New task')).not.toBeInTheDocument();
@@ -32,6 +36,7 @@ describe('CreateTaskModal', () => {
   });
 
   it('submits with all fields including labels', () => {
+    jest.useFakeTimers({ now: new Date(2026, 6, 18), doNotFake: ['queueMicrotask'] });
     const { onSubmit } = setup();
 
     fireEvent.change(screen.getByPlaceholderText('Task title'), {
@@ -40,9 +45,11 @@ describe('CreateTaskModal', () => {
     fireEvent.change(screen.getByPlaceholderText('Add a description...'), {
       target: { value: 'the details' },
     });
-    fireEvent.change(screen.getByPlaceholderText('e.g. Today, Tomorrow'), {
-      target: { value: 'Tomorrow' },
-    });
+
+    fireEvent.click(screen.getByText('Pick a date'));
+    fireEvent.click(
+      document.querySelector(`[data-day="${new Date(2026, 6, 20).toLocaleDateString()}"]`)!,
+    );
 
     fireEvent.click(screen.getByRole('button', { name: /add labels/i }));
     fireEvent.click(screen.getByRole('button', { name: 'frontend' }));
@@ -52,7 +59,7 @@ describe('CreateTaskModal', () => {
     expect(onSubmit).toHaveBeenCalledWith({
       title: 'Ship feature',
       description: 'the details',
-      dueDate: 'Tomorrow',
+      dueDate: 'Jul 20, 2026',
       labels: ['frontend'],
     });
   });

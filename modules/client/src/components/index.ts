@@ -1,6 +1,7 @@
 export { Task } from './task';
 export { CreateTaskModal } from './create-task-modal';
 export { LabelPicker } from './label-picker';
+export { DatePicker } from './date-picker';
 export { LoginForm } from './login-form';
 export { SignupForm } from './signup-form';
 export { Sidebar } from './sidebar';
