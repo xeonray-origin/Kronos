@@ -51,10 +51,16 @@ export interface DatePickerProps {
   placeholder?: string;
 }
 
-export interface TaskProps extends Omit<ITask, 'id'> {
+export interface TaskProps extends ITask {
   handleTimer?: (taskId: string) => void;
 }
 
 export interface TaskListProps {
   tasks: ITask[];
+  onSelectTimerTask?: (taskId: string) => void;
+}
+
+export interface TimerTaskCardProps {
+  task: ITask;
+  onClose: () => void;
 }

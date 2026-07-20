@@ -36,7 +36,7 @@ export function CreateTaskModal({ open, onClose, onSubmit }: CreateTaskModalProp
       title: form.title.trim(),
       description: form.description || undefined,
       dueDate: dueDate ? formatDatePickerValue(dueDate) : undefined,
-      labels: labels.length > 0 ? labels : undefined,
+      labels,
     });
     reset();
     onClose();

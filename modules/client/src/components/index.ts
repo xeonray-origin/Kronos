@@ -8,3 +8,4 @@ export { Sidebar } from './sidebar';
 export { Topbar } from './topbar';
 export { Timer } from './timer';
 export { TaskList } from './task-list';
+export { TimerTaskCard } from './timer-task-card';

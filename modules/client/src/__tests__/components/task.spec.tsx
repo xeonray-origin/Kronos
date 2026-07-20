@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Task } from '@/components';
 import { TaskStatus } from '@/types';
 
@@ -44,11 +44,41 @@ describe('Task', () => {
     );
   });
 
-  it('renders timer icon when handleTimer is provided', () => {
-    const { container } = render(
-      <Task title="Timed task" status={TaskStatus.TODO} userId="u1" handleTimer={jest.fn()} />,
+  it('renders timer icon when handleTimer and id are provided', () => {
+    render(
+      <Task
+        id="1"
+        title="Timed task"
+        status={TaskStatus.TODO}
+        userId="u1"
+        handleTimer={jest.fn()}
+      />,
     );
 
-    expect(container.querySelector('svg.lucide-clock')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Toggle task timer card' })).toBeInTheDocument();
+  });
+
+  it('calls handleTimer with task id when clock icon is clicked', () => {
+    const handleTimer = jest.fn();
+    render(
+      <Task
+        id="42"
+        title="Timed task"
+        status={TaskStatus.TODO}
+        userId="u1"
+        handleTimer={handleTimer}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Toggle task timer card' }));
+    expect(handleTimer).toHaveBeenCalledWith('42');
+  });
+
+  it('does not render timer button when id is missing', () => {
+    render(<Task title="No id" status={TaskStatus.TODO} userId="u1" handleTimer={jest.fn()} />);
+
+    expect(
+      screen.queryByRole('button', { name: 'Toggle task timer card' }),
+    ).not.toBeInTheDocument();
   });
 });

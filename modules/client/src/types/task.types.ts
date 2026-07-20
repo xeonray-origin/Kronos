@@ -11,12 +11,11 @@ export type CreateTaskInput = Pick<ITask, 'title' | 'description' | 'dueDate' | 
 
 export interface ITask {
   id?: string;
-  status: TaskStatus;
+  status: TaskStatus | TaskStatus.BACKLOG;
   userId: string;
   title: string;
   description?: string;
   dueDate?: string;
-  label?: string;
   labels?: string[];
   isCompleted?: boolean;
 }

@@ -9,7 +9,7 @@ const GROUPS: { status: TaskStatusType; label: string; dotClass: string }[] = [
   { status: TaskStatus.DONE, label: 'Done', dotClass: 'bg-emerald-500' },
 ];
 
-export function TaskList({ tasks }: TaskListProps) {
+export function TaskList({ tasks, onSelectTimerTask }: TaskListProps) {
   const grouped = tasks.reduce<Record<TaskStatusType, ITask[]>>(
     (acc, task) => {
       if (task.status !== TaskStatus.BACKLOG) {
@@ -24,7 +24,6 @@ export function TaskList({ tasks }: TaskListProps) {
 
   if (activeGroups.length === 0) return null;
 
-  const handleOnClickTimer = (taskId: string) => console.log(`Start timer for task ${taskId}`);
   return (
     <div className="flex flex-col gap-6">
       {activeGroups.map((g) => (
@@ -35,8 +34,8 @@ export function TaskList({ tasks }: TaskListProps) {
             <span className="text-sm text-muted-foreground">{grouped[g.status].length}</span>
           </div>
           <div className="rounded-xl border border-border bg-background divide-y divide-border overflow-hidden">
-            {grouped[g.status].map(({ id, ...rest }) => (
-              <Task key={id} handleTimer={handleOnClickTimer} {...rest} />
+            {grouped[g.status].map((task) => (
+              <Task key={task.id} handleTimer={onSelectTimerTask} {...task} />
             ))}
           </div>
         </section>

@@ -11,6 +11,7 @@ const statusColors: Record<string, string> = {
 };
 
 export function Task({
+  id,
   title,
   dueDate,
   labels,
@@ -59,7 +60,16 @@ export function Task({
               {dueDate}
             </span>
           )}
-          {showTimer && <ClockIcon className="h-4 w-4 text-muted-foreground" />}
+          {showTimer && id && (
+            <button
+              type="button"
+              onClick={() => showTimer(id)}
+              aria-label="Toggle task timer card"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ClockIcon className="h-4 w-4" />
+            </button>
+          )}
         </div>
       )}
     </div>

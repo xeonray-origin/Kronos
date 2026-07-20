@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { TaskList } from '@/components';
 import { TaskStatus, type ITask } from '@/types';
 
@@ -71,5 +71,13 @@ describe('TaskList', () => {
 
     expect(screen.getByText('Write docs')).toBeInTheDocument();
     expect(screen.queryByText('Backlog item')).not.toBeInTheDocument();
+  });
+
+  it('forwards task id to onSelectTimerTask when clock icon is clicked', () => {
+    const onSelectTimerTask = jest.fn();
+    render(<TaskList tasks={[TODO_TASK]} onSelectTimerTask={onSelectTimerTask} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Toggle task timer card' }));
+    expect(onSelectTimerTask).toHaveBeenCalledWith('1');
   });
 });
