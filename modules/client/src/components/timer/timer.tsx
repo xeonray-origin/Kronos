@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/base/button';
 import { cn } from '@/lib/utils';
 import type { TimerProps } from '@/types';
@@ -30,9 +30,18 @@ export function Timer({ initialMinutes = 25, label = 'FOCUS' }: TimerProps) {
     return () => clearInterval(id);
   }, [isRunning]);
 
-  function handleToggle() {
+  function handleStart() {
     if (timeLeft === 0) return;
-    setIsRunning((r) => !r);
+    setIsRunning(true);
+  }
+
+  function handlePause() {
+    setIsRunning(false);
+  }
+
+  function handleClear() {
+    setIsRunning(false);
+    setTimeLeft(initialMinutes * 60);
   }
 
   return (
@@ -48,15 +57,38 @@ export function Timer({ initialMinutes = 25, label = 'FOCUS' }: TimerProps) {
           {label}
         </span>
       </div>
-      <Button
-        variant="destructive"
-        size="lg"
-        className="w-full max-w-48 gap-2 rounded-full bg-destructive text-white hover:bg-destructive/90"
-        onClick={handleToggle}
-      >
-        {isRunning ? <Pause /> : <Play />}
-        {isRunning ? 'Pause' : 'Start'}
-      </Button>
+      <div className="flex w-full max-w-64 gap-2">
+        {isRunning ? (
+          <Button
+            variant="destructive"
+            size="lg"
+            className="flex-1 gap-2 rounded-full bg-destructive text-white hover:bg-destructive/90"
+            onClick={handlePause}
+          >
+            <Pause />
+            Pause
+          </Button>
+        ) : (
+          <Button
+            variant="destructive"
+            size="lg"
+            className="flex-1 gap-2 rounded-full bg-destructive text-white hover:bg-destructive/90"
+            onClick={handleStart}
+          >
+            <Play />
+            Start
+          </Button>
+        )}
+        <Button
+          variant="outline"
+          size="lg"
+          className="flex-1 gap-2 rounded-full"
+          onClick={handleClear}
+        >
+          <RotateCcw />
+          Clear
+        </Button>
+      </div>
     </div>
   );
 }

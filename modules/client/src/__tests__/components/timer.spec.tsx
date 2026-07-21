@@ -59,4 +59,47 @@ describe('Timer', () => {
     });
     expect(screen.getByText('00:00')).toBeInTheDocument();
   });
+
+  it('renders a Clear button alongside Start', () => {
+    render(<Timer />);
+    expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+  });
+
+  it('resets to the initial time when Clear is clicked while idle', () => {
+    render(<Timer initialMinutes={5} />);
+    fireEvent.click(screen.getByRole('button', { name: /clear/i }));
+    expect(screen.getByText('05:00')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /start/i })).toBeInTheDocument();
+  });
+
+  it('stops the countdown and resets to the initial time when Clear is clicked while running', () => {
+    render(<Timer initialMinutes={5} />);
+    fireEvent.click(screen.getByRole('button', { name: /start/i }));
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+    fireEvent.click(screen.getByRole('button', { name: /clear/i }));
+    expect(screen.getByText('05:00')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /start/i })).toBeInTheDocument();
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+    expect(screen.getByText('05:00')).toBeInTheDocument();
+  });
+
+  it('resets to the initial time when Clear is clicked after the timer reaches 00:00', () => {
+    render(<Timer initialMinutes={1} />);
+    fireEvent.click(screen.getByRole('button', { name: /start/i }));
+    act(() => {
+      jest.advanceTimersByTime(61000);
+    });
+    expect(screen.getByText('00:00')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /clear/i }));
+    expect(screen.getByText('01:00')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /start/i }));
+    act(() => {
+      jest.advanceTimersByTime(3000);
+    });
+    expect(screen.getByText('00:57')).toBeInTheDocument();
+  });
 });
