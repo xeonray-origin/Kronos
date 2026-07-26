@@ -8,4 +8,5 @@ export class User extends Entity<User> {
   email!: string;
   phoneNumber!: string;
   role!: string;
+  labelRef!: Types.ObjectId;
 }

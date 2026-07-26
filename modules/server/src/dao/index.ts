@@ -1,5 +1,5 @@
 import { UserDAO } from './user.dao';
 import { TaskDAO } from './task.dao';
-import { ProjectDAO } from './project.dao';
+import { LabelDAO } from './label.dao';
 
-export { UserDAO, TaskDAO, ProjectDAO };
+export { UserDAO, TaskDAO, LabelDAO };

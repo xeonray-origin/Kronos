@@ -26,7 +26,7 @@ app.get('/health-check', (_req, res) => {
   res.json({ message: 'All systems functioning as expected !!!' });
 });
 
-routes.attach(app);
+app.use('/api', routes.attach());
 app.use(methodOverride());
 
 // app.use('*', (req: express.Request, res: express.Response) => {

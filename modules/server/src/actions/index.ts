@@ -6,9 +6,9 @@ import CreateTask from './task/create';
 import UpdateTask from './task/update';
 import DeleteTask from './task/delete';
 import GetUserTasks from './task/get-user-tasks';
-import CreateProject from './project/create';
-import UpdateProject from './project/update';
-import DeleteProject from './project/delete';
+import CreateLabel from './label/create';
+import UpdateLabel from './label/update';
+import DeleteLabel from './label/delete';
 
 export {
   RegisterUser,
@@ -19,7 +19,7 @@ export {
   UpdateTask,
   DeleteTask,
   GetUserTasks,
-  CreateProject,
-  UpdateProject,
-  DeleteProject,
+  CreateLabel,
+  UpdateLabel,
+  DeleteLabel,
 };

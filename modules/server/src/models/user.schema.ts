@@ -29,8 +29,13 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      required: true,
+      required: false,
       default: 'user',
+    },
+    labelRef: {
+      type: Schema.Types.ObjectId,
+      ref: 'Label',
+      required: false,
     },
   },
   {

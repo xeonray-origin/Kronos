@@ -1,6 +1,6 @@
 import { User } from './user.entity';
 import { AuthUser, SessionPayload } from './auth-user.entity';
 import { Task } from './task.entity';
-import { Project } from './project.entity';
+import { Label } from './label.entity';
 
-export { User, AuthUser, SessionPayload, Task, Project };
+export { User, AuthUser, SessionPayload, Task, Label };

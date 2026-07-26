@@ -14,14 +14,8 @@ const taskSchema = new Schema(
     dueDate: {
       type: String,
     },
-    label: {
-      type: String,
-    },
-    priority: {
-      type: String,
-    },
-    project: {
-      type: String,
+    labels: {
+      type: [String],
     },
     status: {
       type: String,

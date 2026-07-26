@@ -1,19 +1,15 @@
-import { CreateProject, DeleteProject, UpdateProject } from '@/actions';
-import { ProjectController } from '@/controllers';
-import { ProjectDAO } from '@/dao';
+import { CreateLabel, DeleteLabel, UpdateLabel } from '@/actions';
+import { LabelController } from '@/controllers';
+import { LabelDAO } from '@/dao';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
-const projectDAO = new ProjectDAO();
+const labelDAO = new LabelDAO();
 
-const CreateProjectAction = new CreateProject(projectDAO);
-const UpdateProjectAction = new UpdateProject(projectDAO);
-const DeleteProjectAction = new DeleteProject(projectDAO);
+const CreateLabelAction = new CreateLabel(labelDAO);
+const UpdateLabelAction = new UpdateLabel(labelDAO);
+const DeleteLabelAction = new DeleteLabel(labelDAO);
 
-const controller = new ProjectController(
-  CreateProjectAction,
-  UpdateProjectAction,
-  DeleteProjectAction,
-);
+const controller = new LabelController(CreateLabelAction, UpdateLabelAction, DeleteLabelAction);
 const router: Router = express.Router();
 
 router.post('/create', async (request: Request, response: Response, next: NextFunction) => {

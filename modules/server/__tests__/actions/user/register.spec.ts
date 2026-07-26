@@ -23,6 +23,7 @@ describe('RegisterUser', () => {
     role: 'user',
     salt: '',
     phoneNumber: '1234567890',
+    labelRef: new Types.ObjectId(),
   };
 
   const encryptedPassword = { password: 'hashed_pw', salt: 'salt_abc' };

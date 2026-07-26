@@ -6,9 +6,7 @@ export class Task extends Entity<Task> {
   title!: string;
   description?: string;
   dueDate?: string;
-  label?: string;
-  priority?: string;
-  project?: string;
+  labels?: string[];
   userId!: Types.ObjectId;
   status!: 'TODO' | 'IN-PROGRESS' | 'DONE' | 'BACKLOG';
 }
