@@ -37,7 +37,7 @@ export interface SidebarProps {
 export interface CreateTaskModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (task: CreateTaskInput) => void;
+  onSubmit: (task: CreateTaskInput) => Promise<void>;
 }
 
 export interface LabelPickerProps {

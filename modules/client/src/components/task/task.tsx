@@ -1,6 +1,7 @@
 import { CalendarIcon, CheckIcon, ClockIcon } from 'lucide-react';
 import { Badge } from '@/components/base/badge';
 import { cn } from '@/lib/utils';
+import { formatDueDate } from '@/lib/dates';
 import { labelColor } from '@/lib/labels';
 import type { TaskProps } from '@/types';
 
@@ -57,7 +58,7 @@ export function Task({
           {dueDate && (
             <span className="flex items-center gap-1 text-xs text-destructive">
               <CalendarIcon className="h-3 w-3" />
-              {dueDate}
+              {formatDueDate(dueDate)}
             </span>
           )}
           {showTimer && id && (

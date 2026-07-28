@@ -1,13 +1,21 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { CreateTaskModal } from '@/components';
 
 describe('CreateTaskModal', () => {
-  const setup = (open = true) => {
+  const setup = (open = true, onSubmit = jest.fn().mockResolvedValue(undefined)) => {
     const onClose = jest.fn();
-    const onSubmit = jest.fn();
     render(<CreateTaskModal open={open} onClose={onClose} onSubmit={onSubmit} />);
     return { onClose, onSubmit };
   };
+
+  const submit = async () => {
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Create task' }));
+    });
+  };
+
+  const typeTitle = (value: string) =>
+    fireEvent.change(screen.getByPlaceholderText('Task title'), { target: { value } });
 
   afterEach(() => {
     jest.useRealTimers();
@@ -18,13 +26,11 @@ describe('CreateTaskModal', () => {
     expect(screen.queryByText('New task')).not.toBeInTheDocument();
   });
 
-  it('submits with only a title, omitting optional fields', () => {
+  it('submits with only a title, omitting optional fields', async () => {
     const { onClose, onSubmit } = setup();
 
-    fireEvent.change(screen.getByPlaceholderText('Task title'), {
-      target: { value: 'Write tests' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: 'Create task' }));
+    typeTitle('Write tests');
+    await submit();
 
     expect(onSubmit).toHaveBeenCalledWith({
       title: 'Write tests',
@@ -35,13 +41,11 @@ describe('CreateTaskModal', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('submits with all fields including labels', () => {
+  it('submits with all fields, sending the due date as an ISO string', async () => {
     jest.useFakeTimers({ now: new Date(2026, 6, 18), doNotFake: ['queueMicrotask'] });
     const { onSubmit } = setup();
 
-    fireEvent.change(screen.getByPlaceholderText('Task title'), {
-      target: { value: 'Ship feature' },
-    });
+    typeTitle('Ship feature');
     fireEvent.change(screen.getByPlaceholderText('Add a description...'), {
       target: { value: 'the details' },
     });
@@ -54,25 +58,104 @@ describe('CreateTaskModal', () => {
     fireEvent.click(screen.getByRole('button', { name: /add labels/i }));
     fireEvent.click(screen.getByRole('button', { name: 'frontend' }));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Create task' }));
+    await submit();
 
     expect(onSubmit).toHaveBeenCalledWith({
       title: 'Ship feature',
       description: 'the details',
-      dueDate: 'Jul 20, 2026',
+      dueDate: '2026-07-20',
       labels: ['frontend'],
     });
   });
 
-  it('does not submit when the title is blank', () => {
+  it('does not submit when the title is blank', async () => {
     const { onSubmit } = setup();
 
-    fireEvent.change(screen.getByPlaceholderText('Task title'), {
-      target: { value: '   ' },
+    typeTitle('   ');
+    await act(async () => {
+      fireEvent.submit(screen.getByPlaceholderText('Task title').closest('form')!);
     });
-    fireEvent.submit(screen.getByPlaceholderText('Task title').closest('form')!);
 
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('shows a validation error and does not submit when the title is too long', async () => {
+    const { onSubmit } = setup();
+
+    typeTitle('a'.repeat(256));
+    await submit();
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText('Title must not exceed 255 characters')).toBeInTheDocument();
+  });
+
+  it('shows a validation error when the description is too long', async () => {
+    const { onSubmit } = setup();
+
+    typeTitle('Write tests');
+    fireEvent.change(screen.getByPlaceholderText('Add a description...'), {
+      target: { value: 'a'.repeat(2001) },
+    });
+    await submit();
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText('Description must not exceed 2000 characters')).toBeInTheDocument();
+  });
+
+  it('shows a validation error when a label is too long', async () => {
+    const longLabel = 'a'.repeat(51);
+    const { onSubmit } = setup();
+
+    typeTitle('Write tests');
+    fireEvent.click(screen.getByRole('button', { name: /add labels/i }));
+    fireEvent.change(screen.getByPlaceholderText('Search labels...'), {
+      target: { value: longLabel },
+    });
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(`Create.*${longLabel}`) }));
+    await submit();
+
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByText('Label at index 0 must not exceed 50 characters')).toBeInTheDocument();
+  });
+
+  it('clears a field error when that field changes', async () => {
+    setup();
+
+    typeTitle('a'.repeat(256));
+    await submit();
+    expect(screen.getByText('Title must not exceed 255 characters')).toBeInTheDocument();
+
+    typeTitle('Reasonable title');
+    expect(screen.queryByText('Title must not exceed 255 characters')).not.toBeInTheDocument();
+  });
+
+  it('keeps the modal open and shows an error when submitting fails', async () => {
+    const onSubmit = jest.fn().mockRejectedValue(new Error('Network error'));
+    const { onClose } = setup(true, onSubmit);
+
+    typeTitle('Write tests');
+    await submit();
+
+    expect(screen.getByText('Failed to create task. Please try again.')).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByPlaceholderText('Task title')).toHaveValue('Write tests');
+  });
+
+  it('clears the submit error once a retry succeeds', async () => {
+    const onSubmit = jest
+      .fn()
+      .mockRejectedValueOnce(new Error('Network error'))
+      .mockResolvedValueOnce(undefined);
+    const { onClose } = setup(true, onSubmit);
+
+    typeTitle('Write tests');
+    await submit();
+    expect(screen.getByText('Failed to create task. Please try again.')).toBeInTheDocument();
+
+    await submit();
+
+    expect(screen.queryByText('Failed to create task. Please try again.')).not.toBeInTheDocument();
+    expect(onClose).toHaveBeenCalled();
   });
 
   it('closes when Cancel is clicked', () => {

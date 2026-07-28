@@ -16,12 +16,12 @@ describe('Task', () => {
         title="Ship feature"
         status={TaskStatus.TODO}
         userId="u1"
-        dueDate="Yesterday"
+        dueDate="2026-07-20"
         labels={['frontend', 'auth']}
       />,
     );
 
-    expect(screen.getByText('Yesterday')).toBeInTheDocument();
+    expect(screen.getByText('Jul 20, 2026')).toBeInTheDocument();
     expect(screen.getByText('frontend')).toBeInTheDocument();
     expect(screen.getByText('auth')).toBeInTheDocument();
   });

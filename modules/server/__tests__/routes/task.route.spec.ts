@@ -40,7 +40,7 @@ jest.mock('@/middlewares/session.middleware', () => ({
   default: jest.fn(() => ({ handle: mockSessionHandle })),
 }));
 
-jest.mock('@/utils', () => ({ JWTToken: jest.fn() }));
+jest.mock('@/utils', () => ({ JWTToken: jest.fn(), taskValidator: {} }));
 
 import router from '@/routes/task.route';
 
@@ -96,21 +96,23 @@ describe('task route', () => {
     expect(next).toHaveBeenCalledWith(error);
   });
 
-  it('POST /create creates a task from the request body', async () => {
+  it('POST /create creates a task for the authenticated user', async () => {
     const created = { id: 'task-1' };
     mockController.create.mockResolvedValue(created);
-    const res = makeResponse();
+    const res = makeResponse('user-123');
 
     await postHandler({ body: { title: 'New task' } } as Request, res, next);
 
-    expect(mockController.create).toHaveBeenCalledWith({ body: { title: 'New task' } });
+    expect(mockController.create).toHaveBeenCalledWith({
+      body: { title: 'New task', userId: 'user-123' },
+    });
     expect(res.send).toHaveBeenCalledWith(created);
   });
 
   it('POST /create forwards errors to next', async () => {
     mockController.create.mockRejectedValue(error);
 
-    await postHandler({ body: {} } as Request, makeResponse(), next);
+    await postHandler({ body: {} } as Request, makeResponse('user-123'), next);
 
     expect(next).toHaveBeenCalledWith(error);
   });

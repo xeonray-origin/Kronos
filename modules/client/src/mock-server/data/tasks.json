@@ -1,55 +1,50 @@
 [
   {
-    "id": "task-1",
+    "_id": "task-1",
     "status": "TODO",
     "userId": "mock-user-id",
     "title": "Draft Q3 product roadmap",
     "description": "Outline the key initiatives and milestones for the next quarter.",
-    "dueDate": "Jul 18",
-    "label": "planning",
-    "project": "Roadmap",
+    "dueDate": "2026-07-18",
+    "labels": ["planning", "roadmap"],
     "isCompleted": false
   },
   {
-    "id": "task-2",
+    "_id": "task-2",
     "status": "TODO",
     "userId": "mock-user-id",
     "title": "Review pull request #142",
     "description": "Check the mock server toggle implementation.",
-    "label": "code-review",
-    "project": "Kronos",
+    "labels": ["code-review"],
     "isCompleted": false
   },
   {
-    "id": "task-3",
+    "_id": "task-3",
     "status": "IN-PROGRESS",
     "userId": "mock-user-id",
     "title": "Implement task dashboard UI",
     "description": "Build the grouped task list with status sections.",
-    "dueDate": "Jul 14",
-    "label": "frontend",
-    "project": "Dashboard",
+    "dueDate": "2026-07-14",
+    "labels": ["frontend"],
     "isCompleted": false
   },
   {
-    "id": "task-4",
+    "_id": "task-4",
     "status": "IN-PROGRESS",
     "userId": "mock-user-id",
     "title": "Wire up authentication refresh flow",
     "description": "Handle 401 responses with silent token refresh.",
-    "label": "auth",
-    "project": "Kronos",
+    "labels": ["auth"],
     "isCompleted": false
   },
   {
-    "id": "task-5",
+    "_id": "task-5",
     "status": "DONE",
     "userId": "mock-user-id",
     "title": "Set up MSW mock server",
     "description": "Add in-browser request mocking for local development.",
-    "dueDate": "Jul 10",
-    "label": "tooling",
-    "project": "Kronos",
+    "dueDate": "2026-07-10",
+    "labels": ["tooling"],
     "isCompleted": true
   }
 ]

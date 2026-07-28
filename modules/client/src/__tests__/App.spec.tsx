@@ -1,7 +1,14 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import App from '@/App';
 import { store } from '@/store';
+import type { CreateTaskInput } from '@/types';
+
+const mockCreateTask = jest.fn();
+
+jest.mock('@/hooks/useTasks', () => ({
+  useTasks: () => ({ createTask: mockCreateTask }),
+}));
 
 jest.mock('react-router', () => ({
   Routes: () => null,
@@ -16,14 +23,44 @@ jest.mock('@/layouts', () => ({
 }));
 
 jest.mock('@/components', () => ({
-  Topbar: ({ onToggleTheme, isDark }: { onToggleTheme: (v: boolean) => void; isDark: boolean }) => (
-    <button data-testid="topbar-toggle" onClick={() => onToggleTheme(!isDark)}>
-      toggle
-    </button>
+  Topbar: ({
+    onToggleTheme,
+    isDark,
+    onAddTask,
+  }: {
+    onToggleTheme: (v: boolean) => void;
+    isDark: boolean;
+    onAddTask: () => void;
+  }) => (
+    <>
+      <button data-testid="topbar-toggle" onClick={() => onToggleTheme(!isDark)}>
+        toggle
+      </button>
+      <button data-testid="topbar-add-task" onClick={onAddTask}>
+        add
+      </button>
+    </>
   ),
   LoginForm: () => <div data-testid="login-form" />,
   SignupForm: () => <div data-testid="signup-form" />,
-  CreateTaskModal: () => null,
+  CreateTaskModal: ({
+    open,
+    onClose,
+    onSubmit,
+  }: {
+    open: boolean;
+    onClose: () => void;
+    onSubmit: (task: CreateTaskInput) => Promise<void>;
+  }) => (
+    <div data-testid="create-task-modal" data-open={open}>
+      <button data-testid="modal-submit" onClick={() => onSubmit({ title: 'New task' })}>
+        submit
+      </button>
+      <button data-testid="modal-close" onClick={onClose}>
+        close
+      </button>
+    </div>
+  ),
 }));
 
 function renderApp() {
@@ -35,6 +72,10 @@ function renderApp() {
 }
 
 describe('App', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders in dark mode by default', () => {
     const { container } = renderApp();
     expect(container.firstChild).toHaveClass('dark');
@@ -56,5 +97,34 @@ describe('App', () => {
     fireEvent.click(screen.getByTestId('topbar-toggle'));
     fireEvent.click(screen.getByTestId('topbar-toggle'));
     expect(container.firstChild).toHaveClass('dark');
+  });
+
+  it('opens the create task modal from the topbar', () => {
+    renderApp();
+    expect(screen.getByTestId('create-task-modal')).toHaveAttribute('data-open', 'false');
+
+    fireEvent.click(screen.getByTestId('topbar-add-task'));
+
+    expect(screen.getByTestId('create-task-modal')).toHaveAttribute('data-open', 'true');
+  });
+
+  it('closes the create task modal', () => {
+    renderApp();
+    fireEvent.click(screen.getByTestId('topbar-add-task'));
+
+    fireEvent.click(screen.getByTestId('modal-close'));
+
+    expect(screen.getByTestId('create-task-modal')).toHaveAttribute('data-open', 'false');
+  });
+
+  it('creates a task when the modal submits', async () => {
+    mockCreateTask.mockResolvedValue({ id: '1', title: 'New task' });
+    renderApp();
+
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('modal-submit'));
+    });
+
+    expect(mockCreateTask).toHaveBeenCalledWith({ title: 'New task' });
   });
 });

@@ -1,13 +1,15 @@
 import { CreateTask, DeleteTask, GetUserTasks, UpdateTask } from '@/actions';
 import { TaskController } from '@/controllers';
 import { TaskDAO } from '@/dao';
+import { Task } from '@/entities';
+import { IValidator } from '@/interfaces';
 import SessionMiddleware from '@/middlewares/session.middleware';
-import { JWTToken } from '@/utils';
+import { JWTToken, taskValidator } from '@/utils';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
 const taskDAO = new TaskDAO();
 
-const CreateTaskAction = new CreateTask(taskDAO);
+const CreateTaskAction = new CreateTask(taskValidator as unknown as IValidator<Task>, taskDAO);
 const UpdateTaskAction = new UpdateTask(taskDAO);
 const DeleteTaskAction = new DeleteTask(taskDAO);
 const GetUserTasksAction = new GetUserTasks(taskDAO);
@@ -37,7 +39,7 @@ router.get('/', async (_request: Request, response: Response, next: NextFunction
 
 router.post('/create', async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const body = request.body;
+    const body = { ...request.body, userId: response.locals.user.userId as string };
     const result = await controller.create({ body });
     response.send(result);
   } catch (err) {

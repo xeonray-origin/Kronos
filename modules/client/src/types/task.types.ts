@@ -9,6 +9,8 @@ export type TaskStatusType = TaskStatus.TODO | TaskStatus.IN_PROGRESS | TaskStat
 
 export type CreateTaskInput = Pick<ITask, 'title' | 'description' | 'dueDate' | 'labels'>;
 
+export type ITaskResponse = Omit<ITask, 'id'> & { _id?: string };
+
 export interface ITask {
   id?: string;
   status: TaskStatus | TaskStatus.BACKLOG;

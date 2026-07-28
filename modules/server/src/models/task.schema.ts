@@ -5,11 +5,10 @@ const taskSchema = new Schema(
   {
     title: {
       type: String,
-      require: true,
+      required: true,
     },
     description: {
       type: String,
-      required: true,
     },
     dueDate: {
       type: String,

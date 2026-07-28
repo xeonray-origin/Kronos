@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { store, authActions } from '@/store';
 const client = axios.create({
-  baseURL: process.env.API_BASE_URL ?? 'http://localhost:8080',
+  baseURL: process.env.API_BASE_URL ?? 'http://localhost:8080/api',
   withCredentials: true,
 });
 

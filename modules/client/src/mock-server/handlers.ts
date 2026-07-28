@@ -1,11 +1,13 @@
 import { http, HttpResponse } from 'msw';
 import type {
+  CreateTaskInput,
   ILoginResponse,
   IRefreshResponse,
   IRegisterPayload,
   IRegisterResponse,
-  ITask,
+  ITaskResponse,
 } from '@/types';
+import { TaskStatus } from '@/types';
 import tasks from './data/tasks.json';
 
 const BASE_URL = process.env.API_BASE_URL ?? 'http://localhost:8000';
@@ -34,5 +36,16 @@ export const handlers = [
     });
   }),
 
-  http.get(`${BASE_URL}/task`, () => HttpResponse.json<ITask[]>(tasks as ITask[])),
+  http.get(`${BASE_URL}/task`, () => HttpResponse.json<ITaskResponse[]>(tasks as ITaskResponse[])),
+
+  http.post(`${BASE_URL}/task/create`, async ({ request }) => {
+    const input = (await request.json()) as CreateTaskInput;
+    return HttpResponse.json<ITaskResponse>({
+      _id: `mock-task-${Date.now()}`,
+      userId: 'mock-user-id',
+      status: TaskStatus.BACKLOG,
+      isCompleted: false,
+      ...input,
+    });
+  }),
 ];

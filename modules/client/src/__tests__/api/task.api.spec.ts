@@ -1,25 +1,47 @@
-import { getTasks } from '@/api/task.api';
+import { createTask, getTasks } from '@/api/task.api';
 import client from '@/api/client';
 
 jest.mock('@/api/client', () => ({
   __esModule: true,
-  default: { get: jest.fn() },
+  default: { get: jest.fn(), post: jest.fn() },
 }));
 
 describe('getTasks', () => {
-  it('calls GET /task and returns the response data', async () => {
-    const mockTasks = [{ _id: '1', title: 'Task', userId: 'u1' }];
-    (client.get as jest.Mock).mockResolvedValue({ data: mockTasks });
+  it('calls GET /task and maps _id onto id', async () => {
+    (client.get as jest.Mock).mockResolvedValue({
+      data: [{ _id: '1', title: 'Task', userId: 'u1' }],
+    });
 
     const result = await getTasks();
 
     expect(client.get).toHaveBeenCalledWith('/task');
-    expect(result).toEqual(mockTasks);
+    expect(result).toEqual([{ id: '1', title: 'Task', userId: 'u1' }]);
   });
 
   it('rejects when the request fails', async () => {
     (client.get as jest.Mock).mockRejectedValue(new Error('Network error'));
 
     await expect(getTasks()).rejects.toThrow('Network error');
+  });
+});
+
+describe('createTask', () => {
+  const input = { title: 'New task', dueDate: '2026-07-20', labels: ['planning'] };
+
+  it('posts to /task/create and maps _id onto id', async () => {
+    (client.post as jest.Mock).mockResolvedValue({
+      data: { _id: '2', userId: 'u1', status: 'BACKLOG', ...input },
+    });
+
+    const result = await createTask(input);
+
+    expect(client.post).toHaveBeenCalledWith('/task/create', input);
+    expect(result).toEqual({ id: '2', userId: 'u1', status: 'BACKLOG', ...input });
+  });
+
+  it('rejects when the request fails', async () => {
+    (client.post as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+    await expect(createTask(input)).rejects.toThrow('Network error');
   });
 });

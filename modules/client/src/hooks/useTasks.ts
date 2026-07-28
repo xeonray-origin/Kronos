@@ -1,5 +1,6 @@
 import { taskApi } from '@/api';
 import { taskActions, useAppDispatch, useAppSelector } from '@/store';
+import type { CreateTaskInput } from '@/types';
 
 export function useTasks() {
   const dispatch = useAppDispatch();
@@ -17,9 +18,21 @@ export function useTasks() {
     }
   };
 
+  const createTask = async (input: CreateTaskInput) => {
+    try {
+      const created = await taskApi.createTask(input);
+      dispatch(taskActions.addTask(created));
+      return created;
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  };
+
   return {
     tasks: items,
     error,
     fetchTasks,
+    createTask,
   };
 }
