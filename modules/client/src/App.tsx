@@ -1,4 +1,4 @@
-import { Topbar, CreateTaskModal } from '@/components';
+import { Topbar, CreateTaskModal, ErrorBoundary } from '@/components';
 import { useEffect, useState } from 'react';
 import './global.css';
 import { AppRoutes } from './routes';
@@ -33,7 +33,9 @@ export default function App() {
             await createTask(task);
           }}
         />
-        <AppRoutes />
+        <ErrorBoundary>
+          <AppRoutes />
+        </ErrorBoundary>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
-import { format, parseISO } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 
 export function formatDueDate(dueDate: string) {
-  return format(parseISO(dueDate), 'PP');
+  const parsed = parseISO(dueDate);
+  return isValid(parsed) ? format(parsed, 'PP') : dueDate;
 }

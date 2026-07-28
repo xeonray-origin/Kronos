@@ -9,3 +9,4 @@ export { Topbar } from './topbar';
 export { Timer } from './timer';
 export { TaskList } from './task-list';
 export { TimerTaskCard } from './timer-task-card';
+export { ErrorBoundary } from './error-boundary';

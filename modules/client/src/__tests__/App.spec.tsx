@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import App from '@/App';
 import { store } from '@/store';
@@ -43,6 +44,7 @@ jest.mock('@/components', () => ({
   ),
   LoginForm: () => <div data-testid="login-form" />,
   SignupForm: () => <div data-testid="signup-form" />,
+  ErrorBoundary: ({ children }: { children: ReactNode }) => <>{children}</>,
   CreateTaskModal: ({
     open,
     onClose,

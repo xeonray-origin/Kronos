@@ -74,6 +74,7 @@ describe('useTasks', () => {
     });
 
     expect(result.current.tasks).toEqual([]);
+    expect(result.current.status).toBe('error');
   });
 
   it('creates a task and appends it to the store', async () => {

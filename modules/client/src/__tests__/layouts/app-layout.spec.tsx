@@ -17,11 +17,12 @@ const MOCK_TASK_2: ITask = {
 };
 
 let mockTasks: ITask[] = [];
+let mockStatus = 'idle';
 
 jest.mock('@/hooks/useTasks', () => ({
   useTasks: () => ({
     tasks: mockTasks,
-    isLoading: false,
+    status: mockStatus,
     error: null,
     fetchTasks: jest.fn(),
   }),
@@ -29,6 +30,7 @@ jest.mock('@/hooks/useTasks', () => ({
 
 beforeEach(() => {
   mockTasks = [];
+  mockStatus = 'idle';
 });
 
 describe('AppLayout', () => {
@@ -42,6 +44,15 @@ describe('AppLayout', () => {
     mockTasks = [MOCK_TASK];
     render(<AppLayout />);
     expect(screen.getByText('Review pull request #482')).toBeInTheDocument();
+  });
+
+  it('renders a load failure message instead of the task list when fetching errored', () => {
+    mockStatus = 'error';
+    mockTasks = [MOCK_TASK];
+    render(<AppLayout />);
+
+    expect(screen.getByText("Couldn't load tasks")).toBeInTheDocument();
+    expect(screen.queryByText('Review pull request #482')).not.toBeInTheDocument();
   });
 
   it('renders the timer hidden below lg', () => {

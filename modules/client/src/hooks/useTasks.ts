@@ -15,6 +15,7 @@ export function useTasks() {
     } catch (e) {
       console.log(e);
       dispatch(taskActions.setTasks([]));
+      dispatch(taskActions.setStatus('error'));
     }
   };
 
@@ -31,6 +32,7 @@ export function useTasks() {
 
   return {
     tasks: items,
+    status,
     error,
     fetchTasks,
     createTask,

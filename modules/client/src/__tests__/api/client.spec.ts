@@ -23,7 +23,7 @@ describe('client', () => {
   });
 
   it('has the correct baseURL', () => {
-    expect(client.defaults.baseURL).toBe('http://localhost:8080');
+    expect(client.defaults.baseURL).toBe('http://localhost:8080/api');
   });
 
   it('sends credentials with every request', () => {

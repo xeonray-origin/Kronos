@@ -28,9 +28,9 @@ const BACKLOG_TASK: ITask = {
 };
 
 describe('TaskList', () => {
-  it('renders nothing when tasks array is empty', () => {
-    const { container } = render(<TaskList tasks={[]} />);
-    expect(container.firstChild).toBeNull();
+  it('renders an empty state when tasks array is empty', () => {
+    render(<TaskList tasks={[]} />);
+    expect(screen.getByText('No tasks yet')).toBeInTheDocument();
   });
 
   it('renders correct group headers for each status', () => {
@@ -66,11 +66,20 @@ describe('TaskList', () => {
     expect(screen.getByText('Fix bug')).toBeInTheDocument();
   });
 
-  it('excludes backlog tasks from all groups', () => {
+  it('renders backlog tasks in their own group', () => {
     render(<TaskList tasks={[TODO_TASK, BACKLOG_TASK]} />);
 
     expect(screen.getByText('Write docs')).toBeInTheDocument();
-    expect(screen.queryByText('Backlog item')).not.toBeInTheDocument();
+    expect(screen.getByText('Backlog')).toBeInTheDocument();
+    expect(screen.getByText('Backlog item')).toBeInTheDocument();
+  });
+
+  it('skips tasks whose status is outside the known groups', () => {
+    const UNKNOWN_TASK = { ...TODO_TASK, id: '6', title: 'Mystery', status: 'ARCHIVED' } as never;
+    render(<TaskList tasks={[TODO_TASK, UNKNOWN_TASK]} />);
+
+    expect(screen.getByText('Write docs')).toBeInTheDocument();
+    expect(screen.queryByText('Mystery')).not.toBeInTheDocument();
   });
 
   it('forwards task id to onSelectTimerTask when clock icon is clicked', () => {

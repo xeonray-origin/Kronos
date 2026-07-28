@@ -4,7 +4,7 @@ import { useTasks } from '@/hooks/useTasks';
 import type { ITask } from '@/types';
 
 export default function AppLayout() {
-  const { tasks, fetchTasks } = useTasks();
+  const { tasks, status, fetchTasks } = useTasks();
   const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -23,7 +23,11 @@ export default function AppLayout() {
         <Sidebar />
       </div>
       <div className="grow p-16">
-        <TaskList tasks={tasks} onSelectTimerTask={handleSelectTimerTask} />
+        {status === 'error' ? (
+          <p className="text-sm text-destructive text-center py-8">Couldn&apos;t load tasks</p>
+        ) : (
+          <TaskList tasks={tasks} onSelectTimerTask={handleSelectTimerTask} />
+        )}
       </div>
       <div
         className="hidden lg:block float-right h-dvh

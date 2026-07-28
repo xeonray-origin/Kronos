@@ -5,8 +5,6 @@ export enum TaskStatus {
   BACKLOG = 'BACKLOG',
 }
 
-export type TaskStatusType = TaskStatus.TODO | TaskStatus.IN_PROGRESS | TaskStatus.DONE;
-
 export type CreateTaskInput = Pick<ITask, 'title' | 'description' | 'dueDate' | 'labels'>;
 
 export type ITaskResponse = Omit<ITask, 'id'> & { _id?: string };
