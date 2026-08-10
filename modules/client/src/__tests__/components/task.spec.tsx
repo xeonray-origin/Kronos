@@ -3,18 +3,20 @@ import { Task } from '@/components';
 import { TaskStatus } from '@/types';
 
 describe('Task', () => {
-  it('renders title and complete button when no optional props are provided', () => {
-    render(<Task title="Write tests" status={TaskStatus.TODO} userId="u1" />);
+  it('renders title and an uncompleted circle when no optional props are provided', () => {
+    render(<Task title="Write tests" status={TaskStatus.BACKLOG} userId="u1" />);
 
     expect(screen.getByText('Write tests')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Complete task' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Complete task' }).className).toMatch(
+      /border-muted-foreground/,
+    );
   });
 
   it('renders dueDate and labels when provided', () => {
     render(
       <Task
         title="Ship feature"
-        status={TaskStatus.TODO}
+        status={TaskStatus.BACKLOG}
         userId="u1"
         dueDate="2026-07-20"
         labels={['frontend', 'auth']}
@@ -26,36 +28,44 @@ describe('Task', () => {
     expect(screen.getByText('auth')).toBeInTheDocument();
   });
 
-  it('renders completed state with strikethrough and checkmark', () => {
-    render(<Task title="Done task" status={TaskStatus.DONE} userId="u1" isCompleted />);
+  it('renders done state with strikethrough and checkmark', () => {
+    render(<Task title="Done task" status={TaskStatus.DONE} userId="u1" />);
 
-    const title = screen.getByText('Done task');
-    expect(title.className).toMatch(/line-through/);
+    expect(screen.getByText('Done task').className).toMatch(/line-through/);
     expect(screen.getByRole('button', { name: 'Complete task' }).className).toMatch(
       /bg-emerald-500/,
     );
   });
 
-  it('applies status-based circle color', () => {
-    render(<Task title="In progress" status={TaskStatus.IN_PROGRESS} userId="u1" />);
-
-    expect(screen.getByRole('button', { name: 'Complete task' }).className).toMatch(
-      /text-blue-500/,
-    );
-  });
-
-  it('renders timer icon when handleTimer and id are provided', () => {
+  it('calls onToggleStatus with the task id when the circle is clicked', () => {
+    const onToggleStatus = jest.fn();
     render(
       <Task
-        id="1"
-        title="Timed task"
-        status={TaskStatus.TODO}
+        id="42"
+        title="Toggle me"
+        status={TaskStatus.BACKLOG}
         userId="u1"
-        handleTimer={jest.fn()}
+        onToggleStatus={onToggleStatus}
       />,
     );
 
-    expect(screen.getByRole('button', { name: 'Toggle task timer card' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Complete task' }));
+    expect(onToggleStatus).toHaveBeenCalledWith('42');
+  });
+
+  it('does not call onToggleStatus when the task has no id', () => {
+    const onToggleStatus = jest.fn();
+    render(
+      <Task
+        title="No id"
+        status={TaskStatus.BACKLOG}
+        userId="u1"
+        onToggleStatus={onToggleStatus}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Complete task' }));
+    expect(onToggleStatus).not.toHaveBeenCalled();
   });
 
   it('calls handleTimer with task id when clock icon is clicked', () => {
@@ -64,7 +74,7 @@ describe('Task', () => {
       <Task
         id="42"
         title="Timed task"
-        status={TaskStatus.TODO}
+        status={TaskStatus.BACKLOG}
         userId="u1"
         handleTimer={handleTimer}
       />,
@@ -75,7 +85,7 @@ describe('Task', () => {
   });
 
   it('does not render timer button when id is missing', () => {
-    render(<Task title="No id" status={TaskStatus.TODO} userId="u1" handleTimer={jest.fn()} />);
+    render(<Task title="No id" status={TaskStatus.BACKLOG} userId="u1" handleTimer={jest.fn()} />);
 
     expect(
       screen.queryByRole('button', { name: 'Toggle task timer card' }),

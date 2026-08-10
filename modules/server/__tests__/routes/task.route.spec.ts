@@ -40,7 +40,11 @@ jest.mock('@/middlewares/session.middleware', () => ({
   default: jest.fn(() => ({ handle: mockSessionHandle })),
 }));
 
-jest.mock('@/utils', () => ({ JWTToken: jest.fn(), taskValidator: {} }));
+jest.mock('@/utils', () => ({
+  JWTToken: jest.fn(),
+  taskValidator: {},
+  taskUpdateValidator: {},
+}));
 
 import router from '@/routes/task.route';
 
@@ -117,10 +121,10 @@ describe('task route', () => {
     expect(next).toHaveBeenCalledWith(error);
   });
 
-  it('PUT /update/:id updates the task', async () => {
+  it('PUT /update/:id updates the task scoped to the authenticated user', async () => {
     const updated = { id: 'task-1' };
     mockController.update.mockResolvedValue(updated);
-    const res = makeResponse();
+    const res = makeResponse('user-123');
 
     await putHandler(
       { body: { title: 'Updated' }, params: { id: 'task-1' } } as unknown as Request,
@@ -130,7 +134,7 @@ describe('task route', () => {
 
     expect(mockController.update).toHaveBeenCalledWith({
       body: { title: 'Updated' },
-      params: { id: 'task-1' },
+      params: { id: 'task-1', userId: 'user-123' },
     });
     expect(res.send).toHaveBeenCalledWith(updated);
   });
@@ -140,27 +144,33 @@ describe('task route', () => {
 
     await putHandler(
       { body: {}, params: { id: 'task-1' } } as unknown as Request,
-      makeResponse(),
+      makeResponse('user-123'),
       next,
     );
 
     expect(next).toHaveBeenCalledWith(error);
   });
 
-  it('DELETE /delete/:id deletes the task', async () => {
+  it('DELETE /delete/:id deletes the task scoped to the authenticated user', async () => {
     mockController.delete.mockResolvedValue(true);
-    const res = makeResponse();
+    const res = makeResponse('user-123');
 
     await deleteHandler({ params: { id: 'task-1' } } as unknown as Request, res, next);
 
-    expect(mockController.delete).toHaveBeenCalledWith({ params: { id: 'task-1' } });
+    expect(mockController.delete).toHaveBeenCalledWith({
+      params: { id: 'task-1', userId: 'user-123' },
+    });
     expect(res.send).toHaveBeenCalledWith(true);
   });
 
   it('DELETE /delete/:id forwards errors to next', async () => {
     mockController.delete.mockRejectedValue(error);
 
-    await deleteHandler({ params: { id: 'task-1' } } as unknown as Request, makeResponse(), next);
+    await deleteHandler(
+      { params: { id: 'task-1' } } as unknown as Request,
+      makeResponse('user-123'),
+      next,
+    );
 
     expect(next).toHaveBeenCalledWith(error);
   });

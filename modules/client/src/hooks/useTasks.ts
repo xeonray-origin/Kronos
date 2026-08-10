@@ -1,10 +1,11 @@
 import { taskApi } from '@/api';
 import { taskActions, useAppDispatch, useAppSelector } from '@/store';
+import { TaskStatus } from '@/types';
 import type { CreateTaskInput } from '@/types';
 
 export function useTasks() {
   const dispatch = useAppDispatch();
-  const { items, status, error } = useAppSelector((state) => state.tasks);
+  const { items, status, error, activeLabel } = useAppSelector((state) => state.tasks);
 
   const fetchTasks = async () => {
     try {
@@ -30,11 +31,34 @@ export function useTasks() {
     }
   };
 
+  const toggleTaskStatus = async (id: string) => {
+    const current = items.find((task) => task.id === id);
+    if (!current) return;
+
+    const status = current.status === TaskStatus.DONE ? TaskStatus.BACKLOG : TaskStatus.DONE;
+    dispatch(taskActions.updateTask({ ...current, status }));
+
+    try {
+      const updated = await taskApi.updateTask(id, { status });
+      dispatch(taskActions.updateTask(updated));
+    } catch (e) {
+      console.log(e);
+      dispatch(taskActions.updateTask(current));
+    }
+  };
+
+  const selectLabel = (label: string) => {
+    dispatch(taskActions.setActiveLabel(activeLabel === label ? null : label));
+  };
+
   return {
     tasks: items,
-    status,
+    apiStatus: status,
     error,
+    activeLabel,
     fetchTasks,
     createTask,
+    toggleTaskStatus,
+    selectLabel,
   };
 }

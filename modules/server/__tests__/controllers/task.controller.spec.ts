@@ -45,26 +45,26 @@ describe('TaskController', () => {
   });
 
   describe('update', () => {
-    it('delegates to updateTask action with id from params and body as payload', async () => {
+    it('delegates to updateTask action with id and userId from params and body as payload', async () => {
       const body = { title: 'Updated title' };
       const id = taskId.toString();
       mockUpdateTask.call.mockResolvedValue(taskDoc);
 
-      const result = await controller.update({ body, params: { id } });
+      const result = await controller.update({ body, params: { id, userId: userId.toString() } });
 
-      expect(mockUpdateTask.call).toHaveBeenCalledWith(id, body);
+      expect(mockUpdateTask.call).toHaveBeenCalledWith(id, userId.toString(), body);
       expect(result).toBe(taskDoc);
     });
   });
 
   describe('delete', () => {
-    it('delegates to deleteTask action with id from params', async () => {
+    it('delegates to deleteTask action with id and userId from params', async () => {
       const id = taskId.toString();
       mockDeleteTask.call.mockResolvedValue(true);
 
-      const result = await controller.delete({ params: { id } });
+      const result = await controller.delete({ params: { id, userId: userId.toString() } });
 
-      expect(mockDeleteTask.call).toHaveBeenCalledWith(id);
+      expect(mockDeleteTask.call).toHaveBeenCalledWith(id, userId.toString());
       expect(result).toBe(true);
     });
   });

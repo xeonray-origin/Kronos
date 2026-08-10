@@ -4,7 +4,7 @@ import { TaskStatus, type ITask } from '@/types';
 
 const TASK: ITask = {
   id: '1',
-  status: TaskStatus.TODO,
+  status: TaskStatus.BACKLOG,
   title: 'Write docs',
   description: 'Cover the API',
   userId: 'u1',

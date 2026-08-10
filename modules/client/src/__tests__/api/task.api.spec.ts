@@ -1,9 +1,10 @@
-import { createTask, getTasks } from '@/api/task.api';
+import { createTask, getTasks, updateTask } from '@/api/task.api';
 import client from '@/api/client';
+import { TaskStatus } from '@/types';
 
 jest.mock('@/api/client', () => ({
   __esModule: true,
-  default: { get: jest.fn(), post: jest.fn() },
+  default: { get: jest.fn(), post: jest.fn(), put: jest.fn() },
 }));
 
 describe('getTasks', () => {
@@ -43,5 +44,26 @@ describe('createTask', () => {
     (client.post as jest.Mock).mockRejectedValue(new Error('Network error'));
 
     await expect(createTask(input)).rejects.toThrow('Network error');
+  });
+});
+
+describe('updateTask', () => {
+  const patch = { status: TaskStatus.DONE };
+
+  it('puts to /task/update/:id and maps _id onto id', async () => {
+    (client.put as jest.Mock).mockResolvedValue({
+      data: { _id: '3', userId: 'u1', title: 'Task', status: 'DONE' },
+    });
+
+    const result = await updateTask('3', patch);
+
+    expect(client.put).toHaveBeenCalledWith('/task/update/3', patch);
+    expect(result).toEqual({ id: '3', userId: 'u1', title: 'Task', status: 'DONE' });
+  });
+
+  it('rejects when the request fails', async () => {
+    (client.put as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+    await expect(updateTask('3', patch)).rejects.toThrow('Network error');
   });
 });

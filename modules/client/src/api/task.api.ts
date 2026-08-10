@@ -1,5 +1,5 @@
 import client from './client';
-import type { CreateTaskInput, ITask, ITaskResponse } from '@/types';
+import type { CreateTaskInput, ITask, ITaskResponse, UpdateTaskInput } from '@/types';
 
 const toTask = ({ _id, ...task }: ITaskResponse): ITask => ({ ...task, id: _id });
 
@@ -8,3 +8,6 @@ export const getTasks = () =>
 
 export const createTask = (input: CreateTaskInput) =>
   client.post<ITaskResponse>('/task/create', input).then((response) => toTask(response.data));
+
+export const updateTask = (id: string, input: UpdateTaskInput) =>
+  client.put<ITaskResponse>(`/task/update/${id}`, input).then((response) => toTask(response.data));

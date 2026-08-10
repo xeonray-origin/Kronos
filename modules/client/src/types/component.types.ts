@@ -1,5 +1,8 @@
 import type { LucideIcon } from 'lucide-react';
+import type { LabelSummary } from '@/lib/labels';
 import type { CreateTaskInput, ITask } from './task.types';
+
+export type { LabelGroup, LabelSummary } from '@/lib/labels';
 
 export interface TopbarProps {
   appName?: string;
@@ -21,17 +24,17 @@ export interface NavLink {
   active?: boolean;
 }
 
-export interface Project {
-  name: string;
-  emoji?: string;
-  shared?: boolean;
-  count?: number;
-}
-
 export interface SidebarProps {
   user?: { name: string; avatarUrl?: string };
   links?: NavLink[];
-  projects?: Project[];
+  labels?: LabelSummary[];
+  activeLabel?: string | null;
+  onSelectLabel?: (label: string) => void;
+}
+
+export interface LabelItemProps extends LabelSummary {
+  active?: boolean;
+  onSelect?: (label: string) => void;
 }
 
 export interface CreateTaskModalProps {
@@ -53,11 +56,14 @@ export interface DatePickerProps {
 
 export interface TaskProps extends ITask {
   handleTimer?: (taskId: string) => void;
+  onToggleStatus?: (taskId: string) => void;
 }
 
 export interface TaskListProps {
   tasks: ITask[];
+  activeLabel?: string | null;
   onSelectTimerTask?: (taskId: string) => void;
+  onToggleStatus?: (taskId: string) => void;
 }
 
 export interface TimerTaskCardProps {

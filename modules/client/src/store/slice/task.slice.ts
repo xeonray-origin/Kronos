@@ -6,6 +6,7 @@ const initialState: ITasksState = {
   items: [],
   status: 'idle',
   error: null,
+  activeLabel: null,
 };
 
 export const taskSlice = createSlice({

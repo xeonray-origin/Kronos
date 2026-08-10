@@ -4,13 +4,16 @@ import { TaskDAO } from '@/dao';
 import { Task } from '@/entities';
 import { IValidator } from '@/interfaces';
 import SessionMiddleware from '@/middlewares/session.middleware';
-import { JWTToken, taskValidator } from '@/utils';
+import { JWTToken, taskUpdateValidator, taskValidator } from '@/utils';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
 const taskDAO = new TaskDAO();
 
 const CreateTaskAction = new CreateTask(taskValidator as unknown as IValidator<Task>, taskDAO);
-const UpdateTaskAction = new UpdateTask(taskDAO);
+const UpdateTaskAction = new UpdateTask(
+  taskUpdateValidator as unknown as IValidator<Task>,
+  taskDAO,
+);
 const DeleteTaskAction = new DeleteTask(taskDAO);
 const GetUserTasksAction = new GetUserTasks(taskDAO);
 
@@ -51,7 +54,10 @@ router.put('/update/:id', async (request: Request, response: Response, next: Nex
   try {
     const result = await controller.update({
       body: request.body,
-      params: { id: request.params.id as string },
+      params: {
+        id: request.params.id as string,
+        userId: response.locals.user.userId as string,
+      },
     });
     response.send(result);
   } catch (err) {
@@ -62,7 +68,10 @@ router.put('/update/:id', async (request: Request, response: Response, next: Nex
 router.delete('/delete/:id', async (request: Request, response: Response, next: NextFunction) => {
   try {
     const result = await controller.delete({
-      params: { id: request.params.id as string },
+      params: {
+        id: request.params.id as string,
+        userId: response.locals.user.userId as string,
+      },
     });
     response.send(result);
   } catch (err) {

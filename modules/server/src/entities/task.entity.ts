@@ -8,5 +8,5 @@ export class Task extends Entity<Task> {
   dueDate?: string;
   labels?: string[];
   userId!: Types.ObjectId;
-  status!: 'TODO' | 'IN-PROGRESS' | 'DONE' | 'BACKLOG';
+  status!: 'BACKLOG' | 'DONE';
 }

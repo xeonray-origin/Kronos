@@ -23,7 +23,15 @@ const taskSchema = z.object({
     )
     .max(10, 'Maximum 10 labels allowed')
     .optional(),
+  status: z.enum(['BACKLOG', 'DONE'], 'Status must be BACKLOG or DONE').optional(),
   userId: z.string().min(1, 'userId is required'),
 });
+
+const taskUpdateSchema = taskSchema
+  .omit({ userId: true })
+  .partial()
+  .refine((value) => Object.keys(value).length > 0, 'At least one field must be provided');
+
+export const taskUpdateValidator = new Validator(taskUpdateSchema);
 
 export default new Validator(taskSchema);

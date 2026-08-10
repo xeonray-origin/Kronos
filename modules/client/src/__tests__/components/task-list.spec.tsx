@@ -2,28 +2,24 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { TaskList } from '@/components';
 import { TaskStatus, type ITask } from '@/types';
 
-jest.mock('@/hooks/useTasks', () => ({
-  useTasks: () => ({ tasks: [], error: null, fetchTasks: jest.fn() }),
-}));
-
-const TODO_TASK: ITask = { id: '1', status: TaskStatus.TODO, title: 'Write docs', userId: 'u1' };
-const IN_PROGRESS_TASK: ITask = {
+const FRONTEND_AUTH_TASK: ITask = {
+  id: '1',
+  status: TaskStatus.BACKLOG,
+  title: 'Write docs',
+  userId: 'u1',
+  labels: ['frontend', 'auth'],
+};
+const FRONTEND_TASK: ITask = {
   id: '2',
-  status: TaskStatus.IN_PROGRESS,
+  status: TaskStatus.DONE,
   title: 'Fix bug',
   userId: 'u1',
+  labels: ['frontend'],
 };
-const DONE_TASK: ITask = {
+const UNLABELED_TASK: ITask = {
   id: '3',
-  status: TaskStatus.DONE,
-  title: 'Ship feature',
-  userId: 'u1',
-  isCompleted: true,
-};
-const BACKLOG_TASK: ITask = {
-  id: '5',
   status: TaskStatus.BACKLOG,
-  title: 'Backlog item',
+  title: 'Triage inbox',
   userId: 'u1',
 };
 
@@ -33,60 +29,54 @@ describe('TaskList', () => {
     expect(screen.getByText('No tasks yet')).toBeInTheDocument();
   });
 
-  it('renders correct group headers for each status', () => {
-    render(<TaskList tasks={[TODO_TASK, IN_PROGRESS_TASK, DONE_TASK]} />);
+  it('groups tasks by label alphabetically, repeating multi-label tasks in each section', () => {
+    const { container } = render(<TaskList tasks={[FRONTEND_AUTH_TASK, FRONTEND_TASK]} />);
 
-    expect(screen.getByText('To Do')).toBeInTheDocument();
-    expect(screen.getByText('In Progress')).toBeInTheDocument();
-    expect(screen.getByText('Done')).toBeInTheDocument();
+    const headings = [...container.querySelectorAll('section > div > span:nth-child(2)')].map(
+      (node) => node.textContent,
+    );
+    expect(headings).toEqual(['auth', 'frontend']);
+
+    expect(screen.getAllByText('Write docs')).toHaveLength(2);
+    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.getByText('2')).toBeInTheDocument();
   });
 
-  it('shows correct task count per group', () => {
-    render(
-      <TaskList tasks={[TODO_TASK, { ...TODO_TASK, id: '4', title: 'Another todo' }, DONE_TASK]} />,
+  it('renders unlabeled tasks in a trailing No label section', () => {
+    const { container } = render(<TaskList tasks={[UNLABELED_TASK, FRONTEND_TASK]} />);
+
+    const headings = [...container.querySelectorAll('section > div > span:nth-child(2)')].map(
+      (node) => node.textContent,
+    );
+    expect(headings).toEqual(['frontend', 'No label']);
+    expect(screen.getByText('Triage inbox')).toBeInTheDocument();
+  });
+
+  it('renders only the matching section when activeLabel is set', () => {
+    const { container } = render(
+      <TaskList tasks={[FRONTEND_AUTH_TASK, UNLABELED_TASK]} activeLabel="auth" />,
     );
 
-    const counts = screen.getAllByText('2');
-    expect(counts.length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('1')).toBeInTheDocument();
-  });
-
-  it('only renders groups that have tasks', () => {
-    render(<TaskList tasks={[TODO_TASK]} />);
-
-    expect(screen.getByText('To Do')).toBeInTheDocument();
-    expect(screen.queryByText('In Progress')).not.toBeInTheDocument();
-    expect(screen.queryByText('Done')).not.toBeInTheDocument();
-  });
-
-  it('renders task titles inside the correct group section', () => {
-    render(<TaskList tasks={[TODO_TASK, IN_PROGRESS_TASK]} />);
-
-    expect(screen.getByText('Write docs')).toBeInTheDocument();
-    expect(screen.getByText('Fix bug')).toBeInTheDocument();
-  });
-
-  it('renders backlog tasks in their own group', () => {
-    render(<TaskList tasks={[TODO_TASK, BACKLOG_TASK]} />);
-
-    expect(screen.getByText('Write docs')).toBeInTheDocument();
-    expect(screen.getByText('Backlog')).toBeInTheDocument();
-    expect(screen.getByText('Backlog item')).toBeInTheDocument();
-  });
-
-  it('skips tasks whose status is outside the known groups', () => {
-    const UNKNOWN_TASK = { ...TODO_TASK, id: '6', title: 'Mystery', status: 'ARCHIVED' } as never;
-    render(<TaskList tasks={[TODO_TASK, UNKNOWN_TASK]} />);
-
-    expect(screen.getByText('Write docs')).toBeInTheDocument();
-    expect(screen.queryByText('Mystery')).not.toBeInTheDocument();
+    const headings = [...container.querySelectorAll('section > div > span:nth-child(2)')].map(
+      (node) => node.textContent,
+    );
+    expect(headings).toEqual(['auth']);
+    expect(screen.queryByText('Triage inbox')).not.toBeInTheDocument();
   });
 
   it('forwards task id to onSelectTimerTask when clock icon is clicked', () => {
     const onSelectTimerTask = jest.fn();
-    render(<TaskList tasks={[TODO_TASK]} onSelectTimerTask={onSelectTimerTask} />);
+    render(<TaskList tasks={[FRONTEND_TASK]} onSelectTimerTask={onSelectTimerTask} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Toggle task timer card' }));
-    expect(onSelectTimerTask).toHaveBeenCalledWith('1');
+    expect(onSelectTimerTask).toHaveBeenCalledWith('2');
+  });
+
+  it('forwards task id to onToggleStatus when the complete circle is clicked', () => {
+    const onToggleStatus = jest.fn();
+    render(<TaskList tasks={[FRONTEND_TASK]} onToggleStatus={onToggleStatus} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Complete task' }));
+    expect(onToggleStatus).toHaveBeenCalledWith('2');
   });
 });

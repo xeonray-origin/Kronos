@@ -18,7 +18,7 @@ const taskSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['TODO', 'IN-PROGRESS', 'DONE', 'BACKLOG'],
+      enum: ['BACKLOG', 'DONE'],
       default: 'BACKLOG',
     },
     userId: {

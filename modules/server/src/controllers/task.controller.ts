@@ -1,8 +1,5 @@
 import { Task } from '@/entities';
 import { IAction, IRequest } from '@/interfaces';
-import { Response } from 'express';
-import _ from 'lodash';
-
 export default class TaskController {
   constructor(
     protected createTask: IAction<Task>,
@@ -18,13 +15,15 @@ export default class TaskController {
 
   async update(request: IRequest): Promise<Task> {
     const id = request.params?.id as string;
+    const userId = request.params?.userId as string;
     const payload = request.body as Partial<Task>;
-    return this.updateTask.call(id, payload);
+    return this.updateTask.call(id, userId, payload);
   }
 
   async delete(request: IRequest): Promise<boolean> {
     const id = request.params?.id as string;
-    return this.deleteTask.call(id);
+    const userId = request.params?.userId as string;
+    return this.deleteTask.call(id, userId);
   }
 
   async getByUser(request: IRequest): Promise<Task[]> {

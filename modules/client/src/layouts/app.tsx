@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Sidebar, TaskList, Timer, TimerTaskCard } from '@/components';
 import { useTasks } from '@/hooks/useTasks';
+import { labelCounts } from '@/lib/labels';
 import type { ITask } from '@/types';
 
 export default function AppLayout() {
-  const { tasks, status, fetchTasks } = useTasks();
+  const { tasks, apiStatus, activeLabel, fetchTasks, selectLabel, toggleTaskStatus } = useTasks();
   const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -20,13 +21,22 @@ export default function AppLayout() {
   return (
     <main className="flex h-[calc(100dvh-4rem)] w-full pt-16">
       <div className="hidden md:block flex-none h-dvh">
-        <Sidebar />
+        <Sidebar
+          labels={labelCounts(tasks)}
+          activeLabel={activeLabel}
+          onSelectLabel={selectLabel}
+        />
       </div>
       <div className="grow p-16">
-        {status === 'error' ? (
+        {apiStatus === 'error' ? (
           <p className="text-sm text-destructive text-center py-8">Couldn&apos;t load tasks</p>
         ) : (
-          <TaskList tasks={tasks} onSelectTimerTask={handleSelectTimerTask} />
+          <TaskList
+            tasks={tasks}
+            activeLabel={activeLabel}
+            onSelectTimerTask={handleSelectTimerTask}
+            onToggleStatus={toggleTaskStatus}
+          />
         )}
       </div>
       <div

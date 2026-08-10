@@ -7,16 +7,15 @@ import {
   ChevronDown,
   Download,
   Ellipsis,
-  Hash,
   Inbox,
   PanelLeft,
   Plus,
   Search,
   TriangleAlert,
-  Users,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { labelColor } from '@/lib/labels';
 import {
   Alert,
   AlertAction,
@@ -28,18 +27,13 @@ import {
   AvatarImage,
   Button,
 } from '@/components/base';
-import type { NavLink, Project, SidebarProps } from '@/types';
+import type { LabelItemProps, NavLink, SidebarProps } from '@/types';
 
 const defaultLinks: NavLink[] = [
   { icon: Inbox, label: 'Inbox', count: 8 },
   { icon: CalendarDays, label: 'Today', count: 2, active: true },
   { icon: CalendarDays, label: 'Upcoming' },
   { icon: ChartNoAxesCombined, label: 'Analyze' },
-];
-
-const defaultProjects: Project[] = [
-  { name: 'Grocery List', emoji: '🍎', shared: true, count: 4 },
-  { name: 'Blog topics', count: 5 },
 ];
 
 function NavItem({ icon: Icon, label, count, active }: NavLink) {
@@ -63,20 +57,20 @@ function NavItem({ icon: Icon, label, count, active }: NavLink) {
   );
 }
 
-function ProjectItem({ name, emoji, shared, count }: Project) {
+function LabelItem({ label, count, active, onSelect }: LabelItemProps) {
   return (
     <button
-      className="flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium 
-    text-sidebar-foreground/90 transition-colors hover:bg-sidebar-accent"
+      onClick={() => onSelect?.(label)}
+      className={cn(
+        'flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium transition-colors',
+        active ? 'bg-brand/15 text-brand' : 'text-sidebar-foreground/90 hover:bg-sidebar-accent',
+      )}
     >
-      <Hash className="size-[18px] shrink-0 text-emerald-500" />
-      <span className="flex items-center gap-1.5 truncate text-left">
-        {name}
-        {emoji && <span aria-hidden>{emoji}</span>}
+      <span className={cn('size-2.5 shrink-0 rounded-full', labelColor(label).dot)} />
+      <span className="flex-1 truncate text-left">{label}</span>
+      <span className={cn('text-xs', active ? 'text-brand' : 'text-muted-foreground')}>
+        {count}
       </span>
-      {shared && <Users className="size-4 shrink-0 text-muted-foreground" />}
-      <span className="flex-1" />
-      {count != null && <span className="text-xs text-muted-foreground">{count}</span>}
     </button>
   );
 }
@@ -84,7 +78,9 @@ function ProjectItem({ name, emoji, shared, count }: Project) {
 export function Sidebar({
   user = { name: 'Xeonray' },
   links = defaultLinks,
-  projects = defaultProjects,
+  labels = [],
+  activeLabel,
+  onSelectLabel,
 }: SidebarProps) {
   return (
     <aside
@@ -121,9 +117,14 @@ export function Sidebar({
       </nav>
 
       <div className="mt-5 flex flex-col gap-0.5 px-3">
-        <h2 className="px-2.5 pb-1 text-sm font-semibold text-muted-foreground">My Projects</h2>
-        {projects.map((project) => (
-          <ProjectItem key={project.name} {...project} />
+        <h2 className="px-2.5 pb-1 text-sm font-semibold text-muted-foreground">Labels</h2>
+        {labels.map((item) => (
+          <LabelItem
+            key={item.label}
+            {...item}
+            active={item.label === activeLabel}
+            onSelect={onSelectLabel}
+          />
         ))}
       </div>
     </aside>

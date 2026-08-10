@@ -5,15 +5,15 @@ import { Task as TaskModel } from '@/models';
 jest.mock('@/models', () => ({
   Task: {
     create: jest.fn(),
-    findByIdAndUpdate: jest.fn(),
-    findByIdAndDelete: jest.fn(),
+    findOneAndUpdate: jest.fn(),
+    findOneAndDelete: jest.fn(),
     find: jest.fn(),
   },
 }));
 
 const mockCreate = TaskModel.create as jest.Mock;
-const mockFindByIdAndUpdate = TaskModel.findByIdAndUpdate as jest.Mock;
-const mockFindByIdAndDelete = TaskModel.findByIdAndDelete as jest.Mock;
+const mockFindOneAndUpdate = TaskModel.findOneAndUpdate as jest.Mock;
+const mockFindOneAndDelete = TaskModel.findOneAndDelete as jest.Mock;
 const mockFind = TaskModel.find as jest.Mock;
 
 describe('TaskDAO', () => {
@@ -54,41 +54,58 @@ describe('TaskDAO', () => {
   });
 
   describe('update', () => {
-    it('returns the updated task document', async () => {
+    it('scopes the update to the owner and returns the updated document', async () => {
       const updatedDoc = { _id: taskId, ...taskInput, title: 'Updated title' };
-      mockFindByIdAndUpdate.mockResolvedValueOnce(updatedDoc);
+      mockFindOneAndUpdate.mockResolvedValueOnce(updatedDoc);
 
-      const result = await dao.update(taskId, { title: 'Updated title' });
+      const result = await dao.update(taskId, userId.toString(), { title: 'Updated title' });
 
-      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
-        taskId,
+      expect(mockFindOneAndUpdate).toHaveBeenCalledWith(
+        { _id: taskId, userId: userId.toString() },
         { title: 'Updated title' },
-        { new: true },
+        { new: true, runValidators: true },
       );
       expect(result).toEqual(updatedDoc);
     });
 
-    it('propagates errors thrown by the model', async () => {
-      mockFindByIdAndUpdate.mockRejectedValueOnce(new Error('DB update failed'));
+    it('returns null when no owned task matches', async () => {
+      mockFindOneAndUpdate.mockResolvedValueOnce(null);
 
-      await expect(dao.update(taskId, { title: 'x' })).rejects.toThrow('DB update failed');
+      await expect(dao.update(taskId, userId.toString(), { title: 'x' })).resolves.toBeNull();
+    });
+
+    it('propagates errors thrown by the model', async () => {
+      mockFindOneAndUpdate.mockRejectedValueOnce(new Error('DB update failed'));
+
+      await expect(dao.update(taskId, userId.toString(), { title: 'x' })).rejects.toThrow(
+        'DB update failed',
+      );
     });
   });
 
   describe('delete', () => {
-    it('returns true after deleting the document', async () => {
-      mockFindByIdAndDelete.mockResolvedValueOnce(null);
+    it('scopes the delete to the owner and returns true when a document was removed', async () => {
+      mockFindOneAndDelete.mockResolvedValueOnce(taskDoc);
 
-      const result = await dao.delete(taskId);
+      const result = await dao.delete(taskId, userId.toString());
 
-      expect(mockFindByIdAndDelete).toHaveBeenCalledWith(taskId);
+      expect(mockFindOneAndDelete).toHaveBeenCalledWith({
+        _id: taskId,
+        userId: userId.toString(),
+      });
       expect(result).toBe(true);
     });
 
-    it('propagates errors thrown by the model', async () => {
-      mockFindByIdAndDelete.mockRejectedValueOnce(new Error('DB delete failed'));
+    it('returns false when no owned task matches', async () => {
+      mockFindOneAndDelete.mockResolvedValueOnce(null);
 
-      await expect(dao.delete(taskId)).rejects.toThrow('DB delete failed');
+      await expect(dao.delete(taskId, userId.toString())).resolves.toBe(false);
+    });
+
+    it('propagates errors thrown by the model', async () => {
+      mockFindOneAndDelete.mockRejectedValueOnce(new Error('DB delete failed'));
+
+      await expect(dao.delete(taskId, userId.toString())).rejects.toThrow('DB delete failed');
     });
   });
 

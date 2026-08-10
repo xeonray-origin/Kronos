@@ -6,6 +6,7 @@ import type {
   IRegisterPayload,
   IRegisterResponse,
   ITaskResponse,
+  UpdateTaskInput,
 } from '@/types';
 import { TaskStatus } from '@/types';
 import tasks from './data/tasks.json';
@@ -44,8 +45,14 @@ export const handlers = [
       _id: `mock-task-${Date.now()}`,
       userId: 'mock-user-id',
       status: TaskStatus.BACKLOG,
-      isCompleted: false,
       ...input,
     });
+  }),
+
+  http.put(`${BASE_URL}/task/update/:id`, async ({ params, request }) => {
+    const patch = (await request.json()) as UpdateTaskInput;
+    const existing = (tasks as ITaskResponse[]).find((task) => task._id === params.id);
+    if (!existing) return new HttpResponse(null, { status: 404 });
+    return HttpResponse.json<ITaskResponse>({ ...existing, ...patch });
   }),
 ];

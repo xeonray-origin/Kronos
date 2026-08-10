@@ -1,36 +1,43 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import AppLayout from '@/layouts/app';
 import { TaskStatus, type ITask } from '@/types';
 
 const MOCK_TASK: ITask = {
   id: '1',
-  status: TaskStatus.TODO,
+  status: TaskStatus.BACKLOG,
   title: 'Review pull request #482',
   userId: 'u1',
 };
 
 const MOCK_TASK_2: ITask = {
   id: '2',
-  status: TaskStatus.TODO,
+  status: TaskStatus.BACKLOG,
   title: 'Fix flaky test',
   userId: 'u1',
 };
 
 let mockTasks: ITask[] = [];
 let mockStatus = 'idle';
+let mockActiveLabel: string | null = null;
+const mockSelectLabel = jest.fn();
 
 jest.mock('@/hooks/useTasks', () => ({
   useTasks: () => ({
     tasks: mockTasks,
-    status: mockStatus,
+    apiStatus: mockStatus,
     error: null,
+    activeLabel: mockActiveLabel,
     fetchTasks: jest.fn(),
+    selectLabel: mockSelectLabel,
+    toggleTaskStatus: jest.fn(),
   }),
 }));
 
 beforeEach(() => {
   mockTasks = [];
   mockStatus = 'idle';
+  mockActiveLabel = null;
+  mockSelectLabel.mockClear();
 });
 
 describe('AppLayout', () => {
@@ -110,5 +117,31 @@ describe('AppLayout', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Close task timer card' }));
 
     expect(screen.queryByText('No sub-tasks yet')).not.toBeInTheDocument();
+  });
+
+  it('shows derived label counts in the sidebar and forwards clicks to selectLabel', () => {
+    mockTasks = [
+      { ...MOCK_TASK, labels: ['frontend'] },
+      { ...MOCK_TASK_2, labels: ['frontend'] },
+    ];
+    const { container } = render(<AppLayout />);
+
+    const sidebarLabel = within(container.querySelector('aside')!).getByText('frontend');
+    expect(sidebarLabel.closest('button')).toHaveTextContent('2');
+
+    fireEvent.click(sidebarLabel);
+    expect(mockSelectLabel).toHaveBeenCalledWith('frontend');
+  });
+
+  it('renders only the active label section when a label is selected', () => {
+    mockTasks = [
+      { ...MOCK_TASK, labels: ['frontend'] },
+      { ...MOCK_TASK_2, labels: ['backend'] },
+    ];
+    mockActiveLabel = 'frontend';
+    render(<AppLayout />);
+
+    expect(screen.getByText('Review pull request #482')).toBeInTheDocument();
+    expect(screen.queryByText('Fix flaky test')).not.toBeInTheDocument();
   });
 });

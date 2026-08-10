@@ -1,7 +1,7 @@
-import { Task, User } from '@/entities';
+import { Task } from '@/entities';
 import { Task as TaskModel } from '@/models';
 import { ITaskDAO } from '@/interfaces/task.interface';
-import { ObjectId, Types } from 'mongoose';
+import { Types } from 'mongoose';
 
 export class TaskDAO implements ITaskDAO {
   async create(task: Task): Promise<Task> {
@@ -9,14 +9,21 @@ export class TaskDAO implements ITaskDAO {
     return createdTask as unknown as Task;
   }
 
-  async update(id: Types.ObjectId | string, task: Partial<Task>): Promise<Task> {
-    const updated = await TaskModel.findByIdAndUpdate(id, task, { new: true });
-    return updated as unknown as Task;
+  async update(
+    id: Types.ObjectId | string,
+    userId: string,
+    task: Partial<Task>,
+  ): Promise<Task | null> {
+    const updated = await TaskModel.findOneAndUpdate({ _id: id, userId }, task, {
+      new: true,
+      runValidators: true,
+    });
+    return updated as unknown as Task | null;
   }
 
-  async delete(id: Types.ObjectId | string): Promise<boolean> {
-    await TaskModel.findByIdAndDelete(id);
-    return true;
+  async delete(id: Types.ObjectId | string, userId: string): Promise<boolean> {
+    const deleted = await TaskModel.findOneAndDelete({ _id: id, userId });
+    return deleted !== null;
   }
 
   async findByUserId(userId: string): Promise<Task[]> {

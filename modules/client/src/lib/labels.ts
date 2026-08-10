@@ -1,3 +1,15 @@
+import type { ITask } from '@/types/task.types';
+
+export interface LabelGroup {
+  label: string | null;
+  tasks: ITask[];
+}
+
+export interface LabelSummary {
+  label: string;
+  count: number;
+}
+
 export const LABEL_CATALOG = [
   'planning',
   'code-review',
@@ -26,4 +38,35 @@ export function labelColor(label: string) {
     hash = (hash * 31 + label.charCodeAt(i)) >>> 0;
   }
   return LABEL_COLORS[hash % LABEL_COLORS.length]!;
+}
+
+export function groupTasksByLabel(tasks: ITask[]): LabelGroup[] {
+  const byLabel = new Map<string, ITask[]>();
+  const unlabeled: ITask[] = [];
+
+  for (const task of tasks) {
+    const labels = [...new Set(task.labels ?? [])];
+    if (labels.length === 0) {
+      unlabeled.push(task);
+      continue;
+    }
+    for (const label of labels) {
+      const bucket = byLabel.get(label);
+      if (bucket) bucket.push(task);
+      else byLabel.set(label, [task]);
+    }
+  }
+
+  const groups: LabelGroup[] = [...byLabel.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([label, grouped]) => ({ label, tasks: grouped }));
+
+  if (unlabeled.length > 0) groups.push({ label: null, tasks: unlabeled });
+  return groups;
+}
+
+export function labelCounts(tasks: ITask[]): LabelSummary[] {
+  return groupTasksByLabel(tasks)
+    .filter((group) => group.label !== null)
+    .map((group) => ({ label: group.label as string, count: group.tasks.length }));
 }

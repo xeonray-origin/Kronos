@@ -1,6 +1,6 @@
 import { Task } from '@/entities';
-import { ValidationError } from '@/errors';
 import { IAction, ITaskDAO, IValidator } from '@/interfaces';
+import { assertValid } from '@/utils';
 
 class CreateTask implements IAction<Task> {
   constructor(
@@ -9,14 +9,7 @@ class CreateTask implements IAction<Task> {
   ) {}
 
   async call(payload: Partial<Task>): Promise<Task> {
-    const { isValid, errors = [], value } = this.validator.validate(payload);
-    if (!isValid) {
-      const errorMessages = Array.isArray(errors)
-        ? errors
-        : errors.issues.map((issue) => issue.message);
-      throw new ValidationError(`Validation failed: ${errorMessages.join(', ')}`);
-    }
-    return await this.taskDAO.create(value);
+    return await this.taskDAO.create(assertValid(this.validator, payload));
   }
 }
 

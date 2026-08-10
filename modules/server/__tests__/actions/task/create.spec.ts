@@ -2,7 +2,6 @@ import CreateTask from '@/actions/task/create';
 import { Task } from '@/entities';
 import { ITaskDAO, IValidator } from '@/interfaces';
 import { Types } from 'mongoose';
-import { ZodError } from 'zod';
 
 const taskId = new Types.ObjectId();
 const userId = new Types.ObjectId();
@@ -43,23 +42,7 @@ describe('CreateTask', () => {
     expect(result).toEqual(taskDoc);
   });
 
-  it('throws a ValidationError with joined messages from a ZodError', async () => {
-    (mockValidator.validate as jest.Mock).mockReturnValueOnce({
-      isValid: false,
-      value: taskInput,
-      errors: new ZodError([
-        { code: 'custom', path: ['title'], message: 'Title is required and cannot be empty' },
-        { code: 'custom', path: ['userId'], message: 'userId is required' },
-      ]),
-    });
-
-    await expect(action.call(taskInput)).rejects.toThrow(
-      'Validation failed: Title is required and cannot be empty, userId is required',
-    );
-    expect(mockTaskDAO.create).not.toHaveBeenCalled();
-  });
-
-  it('throws a ValidationError when errors are a plain string array', async () => {
+  it('throws and skips the DAO when the payload is invalid', async () => {
     (mockValidator.validate as jest.Mock).mockReturnValueOnce({
       isValid: false,
       value: taskInput,
@@ -69,15 +52,7 @@ describe('CreateTask', () => {
     await expect(action.call(taskInput)).rejects.toThrow(
       'Validation failed: Title is required and cannot be empty',
     );
-  });
-
-  it('throws a ValidationError with no messages when errors are omitted', async () => {
-    (mockValidator.validate as jest.Mock).mockReturnValueOnce({
-      isValid: false,
-      value: taskInput,
-    });
-
-    await expect(action.call(taskInput)).rejects.toThrow('Validation failed: ');
+    expect(mockTaskDAO.create).not.toHaveBeenCalled();
   });
 
   it('propagates errors from the DAO', async () => {

@@ -3,13 +3,8 @@ import { Badge } from '@/components/base/badge';
 import { cn } from '@/lib/utils';
 import { formatDueDate } from '@/lib/dates';
 import { labelColor } from '@/lib/labels';
+import { TaskStatus } from '@/types';
 import type { TaskProps } from '@/types';
-
-const statusColors: Record<string, string> = {
-  TODO: 'text-amber-500',
-  'IN-PROGRESS': 'text-blue-500',
-  DONE: 'text-muted-foreground',
-};
 
 export function Task({
   id,
@@ -17,29 +12,32 @@ export function Task({
   dueDate,
   labels,
   status,
-  isCompleted: completed,
   handleTimer: showTimer,
+  onToggleStatus,
 }: TaskProps) {
+  const done = status === TaskStatus.DONE;
   const hasLabels = labels !== undefined && labels.length > 0;
   const hasRight = dueDate || hasLabels || showTimer;
 
   return (
     <div className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors">
       <button
+        type="button"
+        onClick={id ? () => onToggleStatus?.(id) : undefined}
         className={cn(
           'h-5 w-5 shrink-0 rounded-full border-2 transition-colors flex items-center justify-center',
-          completed
+          done
             ? 'bg-emerald-500 border-emerald-500'
-            : cn(statusColors[status ?? 'none'], 'hover:border-primary'),
+            : 'border-muted-foreground hover:border-primary',
         )}
         aria-label="Complete task"
       >
-        {completed && <CheckIcon className="h-3 w-3 text-white" />}
+        {done && <CheckIcon className="h-3 w-3 text-white" />}
       </button>
       <span
         className={cn(
           'flex-1 text-sm font-medium leading-snug truncate min-w-0',
-          completed ? 'line-through text-muted-foreground' : 'text-foreground',
+          done ? 'line-through text-muted-foreground' : 'text-foreground',
         )}
       >
         {title}

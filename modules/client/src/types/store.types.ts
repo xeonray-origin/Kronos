@@ -14,4 +14,5 @@ export interface ITasksState {
   items: ITask[];
   status: ApiStatus;
   error: string | null;
+  activeLabel: string | null;
 }

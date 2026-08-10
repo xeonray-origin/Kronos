@@ -1,5 +1,5 @@
 import { ZodError } from 'zod';
-import taskValidator from '@/utils/validators/task.validator';
+import taskValidator, { taskUpdateValidator } from '@/utils/validators/task.validator';
 
 const validInput = {
   title: 'Draft Q3 roadmap',
@@ -97,5 +97,46 @@ describe('taskValidator', () => {
     const result = taskValidator.validate({ ...validInput, userId: '' });
     expect(result.isValid).toBe(false);
     expect(firstMessage(result.errors)).toBe('userId is required');
+  });
+
+  it('accepts a DONE status', () => {
+    const result = taskValidator.validate({ ...validInput, status: 'DONE' });
+    expect(result.isValid).toBe(true);
+  });
+
+  it('rejects a status outside BACKLOG and DONE', () => {
+    const result = taskValidator.validate({ ...validInput, status: 'TODO' } as never);
+    expect(result.isValid).toBe(false);
+    expect(firstMessage(result.errors)).toBe('Status must be BACKLOG or DONE');
+  });
+});
+
+describe('taskUpdateValidator', () => {
+  it('accepts a partial payload containing only a status', () => {
+    const result = taskUpdateValidator.validate({ status: 'DONE' });
+    expect(result.isValid).toBe(true);
+  });
+
+  it('accepts a partial payload containing only a title', () => {
+    const result = taskUpdateValidator.validate({ title: 'Updated title' });
+    expect(result.isValid).toBe(true);
+  });
+
+  it('strips userId so ownership cannot be reassigned', () => {
+    const result = taskUpdateValidator.validate({ title: 'Updated', userId: 'attacker' } as never);
+    expect(result.isValid).toBe(true);
+    expect(result.value).toEqual({ title: 'Updated' });
+  });
+
+  it('rejects an empty payload', () => {
+    const result = taskUpdateValidator.validate({});
+    expect(result.isValid).toBe(false);
+    expect(firstMessage(result.errors)).toBe('At least one field must be provided');
+  });
+
+  it('rejects a status outside BACKLOG and DONE', () => {
+    const result = taskUpdateValidator.validate({ status: 'TODO' } as never);
+    expect(result.isValid).toBe(false);
+    expect(firstMessage(result.errors)).toBe('Status must be BACKLOG or DONE');
   });
 });
