@@ -109,6 +109,34 @@ describe('TaskDAO', () => {
     });
   });
 
+  describe('logTime', () => {
+    it('increments the time spent on the owned task and returns the updated document', async () => {
+      const updatedDoc = { _id: taskId, ...taskInput, timeSpentSeconds: 390 };
+      mockFindOneAndUpdate.mockResolvedValueOnce(updatedDoc);
+
+      const result = await dao.logTime(taskId, userId.toString(), 390);
+
+      expect(mockFindOneAndUpdate).toHaveBeenCalledWith(
+        { _id: taskId, userId: userId.toString() },
+        { $inc: { timeSpentSeconds: 390 } },
+        { new: true, runValidators: true },
+      );
+      expect(result).toEqual(updatedDoc);
+    });
+
+    it('returns null when no owned task matches', async () => {
+      mockFindOneAndUpdate.mockResolvedValueOnce(null);
+
+      await expect(dao.logTime(taskId, userId.toString(), 390)).resolves.toBeNull();
+    });
+
+    it('propagates errors thrown by the model', async () => {
+      mockFindOneAndUpdate.mockRejectedValueOnce(new Error('DB update failed'));
+
+      await expect(dao.logTime(taskId, userId.toString(), 390)).rejects.toThrow('DB update failed');
+    });
+  });
+
   describe('findByUserId', () => {
     it('returns all tasks for the given userId', async () => {
       const tasks = [taskDoc];

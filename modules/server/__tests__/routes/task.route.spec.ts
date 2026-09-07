@@ -13,6 +13,7 @@ const mockController = {
   update: jest.fn(),
   delete: jest.fn(),
   getByUser: jest.fn(),
+  logTime: jest.fn(),
 };
 
 const mockSessionHandle = jest.fn();
@@ -29,6 +30,7 @@ jest.mock('@/actions', () => ({
   UpdateTask: jest.fn(),
   DeleteTask: jest.fn(),
   GetUserTasks: jest.fn(),
+  LogTaskTime: jest.fn(),
 }));
 
 jest.mock('@/controllers', () => ({
@@ -44,6 +46,7 @@ jest.mock('@/utils', () => ({
   JWTToken: jest.fn(),
   taskValidator: {},
   taskUpdateValidator: {},
+  taskTimeValidator: {},
 }));
 
 import router from '@/routes/task.route';
@@ -57,6 +60,7 @@ describe('task route', () => {
   const useHandler = mockRouter.use.mock.calls[0][0] as Handler;
   const [getPath, getHandler] = mockRouter.get.mock.calls[0] as [string, Handler];
   const [postPath, postHandler] = mockRouter.post.mock.calls[0] as [string, Handler];
+  const [logTimePath, logTimeHandler] = mockRouter.post.mock.calls[1] as [string, Handler];
   const [putPath, putHandler] = mockRouter.put.mock.calls[0] as [string, Handler];
   const [deletePath, deleteHandler] = mockRouter.delete.mock.calls[0] as [string, Handler];
 
@@ -73,6 +77,7 @@ describe('task route', () => {
     expect(postPath).toBe('/create');
     expect(putPath).toBe('/update/:id');
     expect(deletePath).toBe('/delete/:id');
+    expect(logTimePath).toBe('/log-time/:id');
 
     const req = {} as Request;
     const res = makeResponse();
@@ -168,6 +173,36 @@ describe('task route', () => {
 
     await deleteHandler(
       { params: { id: 'task-1' } } as unknown as Request,
+      makeResponse('user-123'),
+      next,
+    );
+
+    expect(next).toHaveBeenCalledWith(error);
+  });
+
+  it('POST /log-time/:id logs time scoped to the authenticated user', async () => {
+    const updated = { id: 'task-1', timeSpentSeconds: 390 };
+    mockController.logTime.mockResolvedValue(updated);
+    const res = makeResponse('user-123');
+
+    await logTimeHandler(
+      { body: { durationSeconds: 390 }, params: { id: 'task-1' } } as unknown as Request,
+      res,
+      next,
+    );
+
+    expect(mockController.logTime).toHaveBeenCalledWith({
+      body: { durationSeconds: 390 },
+      params: { id: 'task-1', userId: 'user-123' },
+    });
+    expect(res.send).toHaveBeenCalledWith(updated);
+  });
+
+  it('POST /log-time/:id forwards errors to next', async () => {
+    mockController.logTime.mockRejectedValue(error);
+
+    await logTimeHandler(
+      { body: {}, params: { id: 'task-1' } } as unknown as Request,
       makeResponse('user-123'),
       next,
     );

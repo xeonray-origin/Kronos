@@ -26,6 +26,19 @@ export class TaskDAO implements ITaskDAO {
     return deleted !== null;
   }
 
+  async logTime(
+    id: Types.ObjectId | string,
+    userId: string,
+    durationSeconds: number,
+  ): Promise<Task | null> {
+    const updated = await TaskModel.findOneAndUpdate(
+      { _id: id, userId },
+      { $inc: { timeSpentSeconds: durationSeconds } },
+      { new: true, runValidators: true },
+    );
+    return updated as unknown as Task | null;
+  }
+
   async findByUserId(userId: string): Promise<Task[]> {
     const tasks = await TaskModel.find({ userId });
     return tasks as unknown as Task[];

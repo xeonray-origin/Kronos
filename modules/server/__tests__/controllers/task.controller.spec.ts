@@ -18,17 +18,20 @@ describe('TaskController', () => {
   let mockUpdateTask: jest.Mocked<IAction<Task>>;
   let mockDeleteTask: jest.Mocked<IAction<string, boolean>>;
   let mockGetUserTasks: jest.Mocked<IAction<string, Task[]>>;
+  let mockLogTaskTime: jest.Mocked<IAction<Task>>;
 
   beforeEach(() => {
     mockCreateTask = { call: jest.fn() };
     mockUpdateTask = { call: jest.fn() };
     mockDeleteTask = { call: jest.fn() };
     mockGetUserTasks = { call: jest.fn() };
+    mockLogTaskTime = { call: jest.fn() };
     controller = new TaskController(
       mockCreateTask,
       mockUpdateTask,
       mockDeleteTask,
       mockGetUserTasks,
+      mockLogTaskTime,
     );
   });
 
@@ -78,6 +81,19 @@ describe('TaskController', () => {
 
       expect(mockGetUserTasks.call).toHaveBeenCalledWith(userId.toString());
       expect(result).toBe(tasks);
+    });
+  });
+
+  describe('logTime', () => {
+    it('delegates to logTaskTime action with id and userId from params and body as payload', async () => {
+      const body = { durationSeconds: 390 };
+      const id = taskId.toString();
+      mockLogTaskTime.call.mockResolvedValue(taskDoc);
+
+      const result = await controller.logTime({ body, params: { id, userId: userId.toString() } });
+
+      expect(mockLogTaskTime.call).toHaveBeenCalledWith(id, userId.toString(), body);
+      expect(result).toBe(taskDoc);
     });
   });
 });

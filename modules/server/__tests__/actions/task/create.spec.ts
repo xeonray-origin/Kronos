@@ -15,6 +15,7 @@ const mockTaskDAO: ITaskDAO = {
   update: jest.fn(),
   delete: jest.fn(),
   findByUserId: jest.fn(),
+  logTime: jest.fn(),
 };
 
 const mockValidator: IValidator<Task> = {

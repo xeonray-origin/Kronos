@@ -6,6 +6,7 @@ import CreateTask from './task/create';
 import UpdateTask from './task/update';
 import DeleteTask from './task/delete';
 import GetUserTasks from './task/get-user-tasks';
+import LogTaskTime from './task/log-time';
 import CreateLabel from './label/create';
 import UpdateLabel from './label/update';
 import DeleteLabel from './label/delete';
@@ -19,6 +20,7 @@ export {
   UpdateTask,
   DeleteTask,
   GetUserTasks,
+  LogTaskTime,
   CreateLabel,
   UpdateLabel,
   DeleteLabel,

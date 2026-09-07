@@ -9,4 +9,5 @@ export class Task extends Entity<Task> {
   labels?: string[];
   userId!: Types.ObjectId;
   status!: 'BACKLOG' | 'DONE';
+  timeSpentSeconds?: number;
 }

@@ -32,6 +32,16 @@ const taskUpdateSchema = taskSchema
   .partial()
   .refine((value) => Object.keys(value).length > 0, 'At least one field must be provided');
 
+const taskTimeSchema = z.object({
+  durationSeconds: z
+    .number()
+    .int('Duration must be a whole number of seconds')
+    .positive('Duration must be greater than zero')
+    .max(86400, 'Duration must not exceed 24 hours'),
+});
+
 export const taskUpdateValidator = new Validator(taskUpdateSchema);
+
+export const taskTimeValidator = new Validator(taskTimeSchema);
 
 export default new Validator(taskSchema);

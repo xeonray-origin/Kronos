@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit",
     "dev": "nodemon --exec tsx src/index.ts",
     "migrate:task-status": "tsx src/scripts/migrate-task-status.ts",
+    "migrate:task-time-spent": "tsx src/scripts/migrate-task-time-spent.ts",
     "start": "node dist/index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

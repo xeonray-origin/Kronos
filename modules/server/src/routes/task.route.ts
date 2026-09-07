@@ -1,10 +1,10 @@
-import { CreateTask, DeleteTask, GetUserTasks, UpdateTask } from '@/actions';
+import { CreateTask, DeleteTask, GetUserTasks, LogTaskTime, UpdateTask } from '@/actions';
 import { TaskController } from '@/controllers';
 import { TaskDAO } from '@/dao';
 import { Task } from '@/entities';
 import { IValidator } from '@/interfaces';
 import SessionMiddleware from '@/middlewares/session.middleware';
-import { JWTToken, taskUpdateValidator, taskValidator } from '@/utils';
+import { JWTToken, taskTimeValidator, taskUpdateValidator, taskValidator } from '@/utils';
 import express, { NextFunction, Request, Response, Router } from 'express';
 
 const taskDAO = new TaskDAO();
@@ -16,6 +16,7 @@ const UpdateTaskAction = new UpdateTask(
 );
 const DeleteTaskAction = new DeleteTask(taskDAO);
 const GetUserTasksAction = new GetUserTasks(taskDAO);
+const LogTaskTimeAction = new LogTaskTime(taskTimeValidator, taskDAO);
 
 const sessionMiddleware = new SessionMiddleware(new JWTToken());
 const controller = new TaskController(
@@ -23,6 +24,7 @@ const controller = new TaskController(
   UpdateTaskAction,
   DeleteTaskAction,
   GetUserTasksAction,
+  LogTaskTimeAction,
 );
 const router: Router = express.Router();
 
@@ -68,6 +70,21 @@ router.put('/update/:id', async (request: Request, response: Response, next: Nex
 router.delete('/delete/:id', async (request: Request, response: Response, next: NextFunction) => {
   try {
     const result = await controller.delete({
+      params: {
+        id: request.params.id as string,
+        userId: response.locals.user.userId as string,
+      },
+    });
+    response.send(result);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/log-time/:id', async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const result = await controller.logTime({
+      body: request.body,
       params: {
         id: request.params.id as string,
         userId: response.locals.user.userId as string,

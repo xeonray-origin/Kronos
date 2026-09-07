@@ -1,5 +1,8 @@
 import { ZodError } from 'zod';
-import taskValidator, { taskUpdateValidator } from '@/utils/validators/task.validator';
+import taskValidator, {
+  taskTimeValidator,
+  taskUpdateValidator,
+} from '@/utils/validators/task.validator';
 
 const validInput = {
   title: 'Draft Q3 roadmap',
@@ -138,5 +141,42 @@ describe('taskUpdateValidator', () => {
     const result = taskUpdateValidator.validate({ status: 'TODO' } as never);
     expect(result.isValid).toBe(false);
     expect(firstMessage(result.errors)).toBe('Status must be BACKLOG or DONE');
+  });
+});
+
+describe('taskTimeValidator', () => {
+  it('accepts a positive whole number of seconds', () => {
+    const result = taskTimeValidator.validate({ durationSeconds: 390 });
+    expect(result.isValid).toBe(true);
+    expect(result.value).toEqual({ durationSeconds: 390 });
+  });
+
+  it('rejects a zero duration', () => {
+    const result = taskTimeValidator.validate({ durationSeconds: 0 });
+    expect(result.isValid).toBe(false);
+    expect(firstMessage(result.errors)).toBe('Duration must be greater than zero');
+  });
+
+  it('rejects a negative duration', () => {
+    const result = taskTimeValidator.validate({ durationSeconds: -5 });
+    expect(result.isValid).toBe(false);
+    expect(firstMessage(result.errors)).toBe('Duration must be greater than zero');
+  });
+
+  it('rejects a fractional duration', () => {
+    const result = taskTimeValidator.validate({ durationSeconds: 1.5 });
+    expect(result.isValid).toBe(false);
+    expect(firstMessage(result.errors)).toBe('Duration must be a whole number of seconds');
+  });
+
+  it('rejects a duration longer than 24 hours', () => {
+    const result = taskTimeValidator.validate({ durationSeconds: 90000 });
+    expect(result.isValid).toBe(false);
+    expect(firstMessage(result.errors)).toBe('Duration must not exceed 24 hours');
+  });
+
+  it('rejects a missing duration', () => {
+    const result = taskTimeValidator.validate({});
+    expect(result.isValid).toBe(false);
   });
 });

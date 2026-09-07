@@ -2,7 +2,7 @@ import { IAction, IValidationResult, IValidator, IRequest, IError } from './gene
 import { IName, IUserDAO } from './user.interface';
 import { IHash, HashAlgorithm, IJwtToken, JwtTokenPayload } from './encryption.interface';
 import { ISessionDAO, SessionInfo } from './auth.interface';
-import { ITaskDAO } from './task.interface';
+import { ITaskDAO, ITaskTimeInput } from './task.interface';
 import { ILabelDAO } from './label.interface';
 
 export type {
@@ -20,5 +20,6 @@ export type {
   ISessionDAO,
   SessionInfo,
   ITaskDAO,
+  ITaskTimeInput,
   ILabelDAO,
 };
