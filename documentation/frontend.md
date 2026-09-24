@@ -110,18 +110,10 @@ src/
 │   ├── component.types.ts  # Shared component prop types
 │   └── index.ts
 │
-├── __mocks__/
-│   ├── styleMock.js        # CSS stub for Jest
-│   └── reactRouterMock.tsx # react-router stub for Jest
-│
-└── mock-server/            # MSW in-browser mock API (dev only) — see mock-server.md
-    ├── handlers.ts         # Request handlers, one per mocked endpoint
-    └── browser.ts          # setupWorker(...handlers) → worker
+└── __mocks__/
+    ├── styleMock.js        # CSS stub for Jest
+    └── reactRouterMock.tsx # react-router stub for Jest
 ```
-
-> **Running without a backend?** `pnpm dev` boots an [MSW](https://mswjs.io/) mock API that
-> answers auth/register requests in the browser, so the SPA runs standalone. See
-> [`mock-server.md`](./mock-server.md) for how it's wired and how to add scenarios.
 
 > Tests live in `src/__tests__/**` mirroring `src/` (e.g. `store/auth.slice.spec.ts`,
 > `api/client.spec.ts`, `hooks/useTasks.spec.ts`), with a few co-located exceptions such as

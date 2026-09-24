@@ -60,10 +60,5 @@
     "commitizen": {
       "path": "@commitlint/cz-commitlint"
     }
-  },
-  "msw": {
-    "workerDirectory": [
-      "modules\\client\\public"
-    ]
   }
 }
