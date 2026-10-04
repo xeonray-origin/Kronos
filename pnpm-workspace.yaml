@@ -1,3 +1,5 @@
 packages:
   - 'modules/client'
   - 'modules/server'
+allowBuilds:
+  esbuild: false
