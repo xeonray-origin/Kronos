@@ -1,6 +1,6 @@
 services:
   mongo:
-    image: mongo:8
+    image: mongo:latest
     container_name: kronos-mongo
     restart: unless-stopped
     ports:
@@ -9,6 +9,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-secret}
       MONGO_INITDB_DATABASE: ${MONGO_DB:-kronos}
+      GLIBC_TUNABLES: glibc.pthread.rseq=1
     volumes:
       - mongo_data:/data/db
 
