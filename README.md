@@ -55,51 +55,70 @@ From the project root, run:
 pnpm install
 ```
 
-### Step 2: Start MongoDB with Docker
+### Step 2: Configure environment variables
+
+Copy the example env files (the defaults match the Docker MongoDB credentials below):
+
+```bash
+cp modules/server/.env.example modules/server/.env
+cp modules/client/.env.example modules/client/.env
+```
+
+In production the server refuses to start unless `MONGODB_URI`, `JWT_SECRET` and `JWT_REFRESH_SECRET` are set. Client variables are inlined into the browser bundle, so never put secrets in `modules/client/.env`.
+
+### Step 3: Start MongoDB with Docker
 
 Before running the application, start the MongoDB container:
 
 ```bash
-docker-compose up -d
+pnpm db:up
 ```
 
 To verify MongoDB is running, check the container status:
 
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 To stop MongoDB later:
 
 ```bash
-docker-compose down
+pnpm db:down
 ```
 
-### Step 3: Start Development Servers
+### Step 4: Start Development Servers
 
-Run the development servers for both client and server:
+The client and server are started separately, each in its own terminal:
 
 ```bash
-pnpm dev
+pnpm dev:server
+pnpm dev:client
 ```
 
 This will start:
 
-- **Backend**: Running on `http://localhost:3000` (or configured port)
-- **Frontend**: Running on `http://localhost:5173` (or configured port)
+- **Backend**: `http://localhost:8080` (override with `PORT`; API under `/api`, health check at `/health-check`)
+- **Frontend**: `http://localhost:3000`
 
 ## Available Commands
 
 Run these from the project root:
 
 - `pnpm install` - Install all dependencies
-- `pnpm dev` - Start development servers (server + client)
-- `pnpm build` - Build all modules for production
-- `pnpm lint` - Lint all modules for code quality issues
-- `pnpm lint:fix` - Fix linting issues automatically
+- `pnpm dev:server` / `pnpm dev:client` - Start the server / client in development mode
+- `pnpm build:client` - Build the client for production
+- `pnpm --filter @kronos/server build` - Build the server for production (the root `build:server` script currently points at the client)
+- `pnpm typecheck` - Type-check the whole workspace
+- `pnpm lint` / `pnpm lint:fix` - Lint (and auto-fix) the codebase
+- `pnpm format` / `pnpm format:check` - Format / check formatting with Prettier
+- `pnpm test:server` - Run server tests
+- `pnpm --filter @kronos/client test` - Run client tests (the root `test:client` script currently points at the server)
+- `pnpm db:up` / `pnpm db:down` / `pnpm db:logs` - Start, stop, and tail logs of the MongoDB container
+
+Commits are checked by Husky hooks: the pre-commit hook runs typecheck, formatting and tests, and commit messages must follow `type(scope): subject` with type `feat`, `fix`, `test` or `chore`.
 
 ## Tech stack
 
-- **Backend**: Express 5.x, TypeScript, Webpack
-- **Frontend**: React 19.x, TypeScript, Webpack
-- **Tooling**: pnpm workspaces, ESLint, Webpack, nodemon
+- **Backend**: Express 5.x, TypeScript, MongoDB (Mongoose), Zod, Webpack
+- **Frontend**: React 19.x, TypeScript, Redux Toolkit, Tailwind CSS 4, Radix UI, Webpack
+- **Tooling**: pnpm workspaces, ESLint, Prettier, Jest, Husky, commitlint, nodemon
