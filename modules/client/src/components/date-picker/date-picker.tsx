@@ -87,7 +87,13 @@ export function DatePicker({ value, onChange, placeholder = 'Pick a date' }: Dat
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-auto p-0">
-        <Calendar mode="single" selected={value} onSelect={handleSelect} autoFocus />
+        <Calendar
+          mode="single"
+          selected={value}
+          defaultMonth={value}
+          onSelect={handleSelect}
+          autoFocus
+        />
         <div className="flex items-center gap-2 border-t border-border p-2.5">
           <ClockIcon className="size-4 shrink-0 text-muted-foreground" />
           <Input

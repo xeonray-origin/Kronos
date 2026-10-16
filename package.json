@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "build:client": "pnpm --filter @kronos/client build",
-    "build:server": "pnpm --filter @kronos/client build",
+    "build:server": "pnpm --filter @kronos/server build",
     "build:clean": "tsc --build --clean",
     "typecheck": "tsc --build --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write --ignore-unknown",
     "format:check": "prettier --check .",
-    "test:client": "pnpm --filter @kronos/server test",
+    "test:client": "pnpm --filter @kronos/client test",
     "test:server": "pnpm --filter @kronos/server test",
     "dev:server": "pnpm --filter @kronos/server dev",
     "dev:client": "pnpm --filter @kronos/client dev",
@@ -21,9 +21,7 @@
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f mongo",
     "docker:up": "docker compose up --build",
-    "docker:down": "docker compose down",
-    "docker:dev": "docker compose -f docker-compose.dev.yml up",
-    "docker:dev:down": "docker compose -f docker-compose.dev.yml down"
+    "docker:down": "docker compose down"
   },
   "repository": {
     "type": "git",
@@ -38,6 +36,7 @@
   ],
   "author": "xeonray-origin",
   "license": "UNLICENSED",
+  "packageManager": "pnpm@10.15.0",
   "bugs": {
     "url": "https://github.com/xeonray-origin/Kronos/issues"
   },

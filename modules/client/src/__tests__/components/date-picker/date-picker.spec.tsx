@@ -2,6 +2,25 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { DatePicker, formatDatePickerValue } from '@/components/date-picker';
 
 describe('DatePicker', () => {
+  beforeEach(() => {
+    jest.useFakeTimers({
+      doNotFake: [
+        'setTimeout',
+        'clearTimeout',
+        'setInterval',
+        'clearInterval',
+        'setImmediate',
+        'queueMicrotask',
+        'nextTick',
+      ],
+    });
+    jest.setSystemTime(new Date(2026, 6, 15));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   const open = () => fireEvent.click(document.querySelector('[aria-haspopup]')!);
   const day = (date: Date) => document.querySelector(`[data-day="${date.toLocaleDateString()}"]`)!;
 

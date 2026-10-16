@@ -38,7 +38,7 @@ If your Node.js includes Corepack (Node 16.14+ / recommended Node 22+), enable i
 
 ```bash
 corepack enable
-corepack prepare pnpm@latest --activate
+corepack prepare pnpm@10.15.0 --activate
 ```
 
 Verify with `pnpm --version`.
@@ -107,12 +107,12 @@ Run these from the project root:
 - `pnpm install` - Install all dependencies
 - `pnpm dev:server` / `pnpm dev:client` - Start the server / client in development mode
 - `pnpm build:client` - Build the client for production
-- `pnpm --filter @kronos/server build` - Build the server for production (the root `build:server` script currently points at the client)
+- `pnpm build:server` - Build the server for production
 - `pnpm typecheck` - Type-check the whole workspace
 - `pnpm lint` / `pnpm lint:fix` - Lint (and auto-fix) the codebase
 - `pnpm format` / `pnpm format:check` - Format / check formatting with Prettier
 - `pnpm test:server` - Run server tests
-- `pnpm --filter @kronos/client test` - Run client tests (the root `test:client` script currently points at the server)
+- `pnpm test:client` - Run client tests
 - `pnpm db:up` / `pnpm db:down` / `pnpm db:logs` - Start, stop, and tail logs of the MongoDB container
 
 Commits are checked by Husky hooks: the pre-commit hook runs typecheck, formatting and tests, and commit messages must follow `type(scope): subject` with type `feat`, `fix`, `test` or `chore`.

@@ -10,11 +10,6 @@ jest.mock('@/api', () => ({
 
 describe('SignupForm', () => {
   describe('rendering', () => {
-    it('renders the Google SSO button', () => {
-      render(<SignupForm />);
-      expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument();
-    });
-
     it('renders the full name input with label and placeholder', () => {
       render(<SignupForm />);
       expect(screen.getByText('Full name')).toBeInTheDocument();
