@@ -15,6 +15,14 @@ export default {
     'MONGODB_URI',
     'mongodb://localhost:27017/kronos',
   ),
+  clientOrigins: requireInProduction(
+    process.env.CLIENT_ORIGIN,
+    'CLIENT_ORIGIN',
+    'http://localhost:3000',
+  )
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
   jwtSecret: requireInProduction(process.env.JWT_SECRET, 'JWT_SECRET', 'your_super_secret_key'),
   jwtRefreshSecret: requireInProduction(
     process.env.JWT_REFRESH_SECRET,

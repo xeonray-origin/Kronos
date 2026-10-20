@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { Express } from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import routes from '@/routes';
 import methodOverride from 'method-override';
 import { IError } from '@/interfaces';
@@ -12,11 +13,12 @@ const port = appConfig.port;
 
 const METHODS_ALLOWED = 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS';
 
+app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: appConfig.clientOrigins,
     methods: METHODS_ALLOWED,
     credentials: true,
   }),

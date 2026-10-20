@@ -4,6 +4,7 @@ import AuthController from '@/controllers/auth.controller';
 import SessionDAO from '@/dao/session.dao';
 import { AuthUser } from '@/entities';
 import { IValidator } from '@/interfaces';
+import { authRateLimiter } from '@/middlewares/rate-limit.middleware';
 import { Hash, userValidator, loginValidator, JWTToken } from '@/utils';
 import express, { NextFunction, Request, Response, Router } from 'express';
 import _ from 'lodash';
@@ -40,25 +41,33 @@ const controller = new AuthController(
 );
 const router: Router = express.Router();
 
-router.post('/register', async (request: Request, response: Response, next: NextFunction) => {
-  try {
-    const body = request.body;
-    const result = await controller.register({ body });
-    response.send(result);
-  } catch (err) {
-    next(err);
-  }
-});
+router.post(
+  '/register',
+  authRateLimiter,
+  async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const body = request.body;
+      const result = await controller.register({ body });
+      response.send(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
-router.post('/login', async (request: Request, response: Response, next: NextFunction) => {
-  try {
-    const body = request.body;
-    const result = await controller.login({ body }, response);
-    response.status(200).json(result);
-  } catch (err) {
-    next(err);
-  }
-});
+router.post(
+  '/login',
+  authRateLimiter,
+  async (request: Request, response: Response, next: NextFunction) => {
+    try {
+      const body = request.body;
+      const result = await controller.login({ body }, response);
+      response.status(200).json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 router.get('/refresh', async (request: Request, response: Response, next: NextFunction) => {
   try {
