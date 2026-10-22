@@ -6,4 +6,10 @@ const labelSchema = z.object({
   userId: z.any(),
 });
 
+const labelUpdateSchema = z.object({
+  labels: z.array(z.string()),
+});
+
+export const labelUpdateValidator = new Validator(labelUpdateSchema);
+
 export default new Validator(labelSchema);

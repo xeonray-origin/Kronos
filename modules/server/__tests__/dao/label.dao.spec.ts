@@ -5,14 +5,14 @@ import { Label as LabelModel } from '@/models';
 jest.mock('@/models', () => ({
   Label: {
     create: jest.fn(),
-    findByIdAndUpdate: jest.fn(),
-    findByIdAndDelete: jest.fn(),
+    findOneAndUpdate: jest.fn(),
+    findOneAndDelete: jest.fn(),
   },
 }));
 
 const mockCreate = LabelModel.create as jest.Mock;
-const mockFindByIdAndUpdate = LabelModel.findByIdAndUpdate as jest.Mock;
-const mockFindByIdAndDelete = LabelModel.findByIdAndDelete as jest.Mock;
+const mockFindOneAndUpdate = LabelModel.findOneAndUpdate as jest.Mock;
+const mockFindOneAndDelete = LabelModel.findOneAndDelete as jest.Mock;
 
 describe('LabelDAO', () => {
   let dao: LabelDAO;
@@ -41,35 +41,52 @@ describe('LabelDAO', () => {
   });
 
   describe('update', () => {
-    it('returns the updated label document', async () => {
+    it('returns the updated label document scoped to the owner', async () => {
       const updatedDoc = { _id: labelId, ...labelInput, labels: ['personal'] };
-      mockFindByIdAndUpdate.mockResolvedValueOnce(updatedDoc);
-      const result = await dao.update(labelId, { labels: ['personal'] });
-      expect(mockFindByIdAndUpdate).toHaveBeenCalledWith(
-        labelId,
+      mockFindOneAndUpdate.mockResolvedValueOnce(updatedDoc);
+      const result = await dao.update(labelId, userId.toString(), { labels: ['personal'] });
+      expect(mockFindOneAndUpdate).toHaveBeenCalledWith(
+        { _id: labelId, userId: userId.toString() },
         { labels: ['personal'] },
-        { new: true },
+        { new: true, runValidators: true },
       );
       expect(result).toEqual(updatedDoc);
     });
 
+    it('returns null when the label is missing or owned by another user', async () => {
+      mockFindOneAndUpdate.mockResolvedValueOnce(null);
+      const result = await dao.update(labelId, 'other-user', { labels: ['x'] });
+      expect(result).toBeNull();
+    });
+
     it('propagates errors thrown by the model', async () => {
-      mockFindByIdAndUpdate.mockRejectedValueOnce(new Error('DB update failed'));
-      await expect(dao.update(labelId, { labels: ['x'] })).rejects.toThrow('DB update failed');
+      mockFindOneAndUpdate.mockRejectedValueOnce(new Error('DB update failed'));
+      await expect(dao.update(labelId, userId.toString(), { labels: ['x'] })).rejects.toThrow(
+        'DB update failed',
+      );
     });
   });
 
   describe('delete', () => {
-    it('returns true after deleting the document', async () => {
-      mockFindByIdAndDelete.mockResolvedValueOnce(null);
-      const result = await dao.delete(labelId);
-      expect(mockFindByIdAndDelete).toHaveBeenCalledWith(labelId);
+    it('returns true after deleting the document scoped to the owner', async () => {
+      mockFindOneAndDelete.mockResolvedValueOnce(labelDoc);
+      const result = await dao.delete(labelId, userId.toString());
+      expect(mockFindOneAndDelete).toHaveBeenCalledWith({
+        _id: labelId,
+        userId: userId.toString(),
+      });
       expect(result).toBe(true);
     });
 
+    it('returns false when the label is missing or owned by another user', async () => {
+      mockFindOneAndDelete.mockResolvedValueOnce(null);
+      const result = await dao.delete(labelId, 'other-user');
+      expect(result).toBe(false);
+    });
+
     it('propagates errors thrown by the model', async () => {
-      mockFindByIdAndDelete.mockRejectedValueOnce(new Error('DB delete failed'));
-      await expect(dao.delete(labelId)).rejects.toThrow('DB delete failed');
+      mockFindOneAndDelete.mockRejectedValueOnce(new Error('DB delete failed'));
+      await expect(dao.delete(labelId, userId.toString())).rejects.toThrow('DB delete failed');
     });
   });
 });

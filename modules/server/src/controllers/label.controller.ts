@@ -15,12 +15,14 @@ export default class LabelController {
 
   async update(request: IRequest): Promise<Label> {
     const id = request.params?.id as string;
+    const userId = request.params?.userId as string;
     const payload = request.body as Partial<Label>;
-    return this.updateLabel.call(id, payload);
+    return this.updateLabel.call(id, userId, payload);
   }
 
   async delete(request: IRequest): Promise<boolean> {
     const id = request.params?.id as string;
-    return this.deleteLabel.call(id);
+    const userId = request.params?.userId as string;
+    return this.deleteLabel.call(id, userId);
   }
 }

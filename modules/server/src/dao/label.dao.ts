@@ -9,13 +9,20 @@ export class LabelDAO implements ILabelDAO {
     return created as unknown as Label;
   }
 
-  async update(id: Types.ObjectId | string, label: Partial<Label>): Promise<Label> {
-    const updated = await LabelModel.findByIdAndUpdate(id, label, { new: true });
-    return updated as unknown as Label;
+  async update(
+    id: Types.ObjectId | string,
+    userId: string,
+    label: Partial<Label>,
+  ): Promise<Label | null> {
+    const updated = await LabelModel.findOneAndUpdate({ _id: id, userId }, label, {
+      new: true,
+      runValidators: true,
+    });
+    return updated as unknown as Label | null;
   }
 
-  async delete(id: Types.ObjectId | string): Promise<boolean> {
-    await LabelModel.findByIdAndDelete(id);
-    return true;
+  async delete(id: Types.ObjectId | string, userId: string): Promise<boolean> {
+    const deleted = await LabelModel.findOneAndDelete({ _id: id, userId });
+    return deleted !== null;
   }
 }

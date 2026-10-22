@@ -1,6 +1,7 @@
 import userValidator from './validators/user.validator';
 import loginValidator from './validators/login.validator';
 import taskValidator, { taskTimeValidator, taskUpdateValidator } from './validators/task.validator';
+import { labelUpdateValidator } from './validators/label.validator';
 import { assertValid } from './validators/assert-valid';
 import { Hash } from './encryption/hash';
 import { JWTToken } from './encryption/jwt';
@@ -12,6 +13,7 @@ export {
   taskValidator,
   taskUpdateValidator,
   taskTimeValidator,
+  labelUpdateValidator,
   assertValid,
   JWTToken,
 };

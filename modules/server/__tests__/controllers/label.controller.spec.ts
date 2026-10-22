@@ -31,22 +31,22 @@ describe('LabelController', () => {
   });
 
   describe('update', () => {
-    it('delegates to updateLabel action with id from params and body as payload', async () => {
+    it('delegates to updateLabel action with id and userId from params and body as payload', async () => {
       const body = { labels: ['personal'] };
       const id = labelId.toString();
       mockUpdateLabel.call.mockResolvedValue(labelDoc);
-      const result = await controller.update({ body, params: { id } });
-      expect(mockUpdateLabel.call).toHaveBeenCalledWith(id, body);
+      const result = await controller.update({ body, params: { id, userId: userId.toString() } });
+      expect(mockUpdateLabel.call).toHaveBeenCalledWith(id, userId.toString(), body);
       expect(result).toBe(labelDoc);
     });
   });
 
   describe('delete', () => {
-    it('delegates to deleteLabel action with id from params', async () => {
+    it('delegates to deleteLabel action with id and userId from params', async () => {
       const id = labelId.toString();
       mockDeleteLabel.call.mockResolvedValue(true);
-      const result = await controller.delete({ params: { id } });
-      expect(mockDeleteLabel.call).toHaveBeenCalledWith(id);
+      const result = await controller.delete({ params: { id, userId: userId.toString() } });
+      expect(mockDeleteLabel.call).toHaveBeenCalledWith(id, userId.toString());
       expect(result).toBe(true);
     });
   });
