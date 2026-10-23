@@ -14,7 +14,15 @@ const makeResponse = (): jest.Mocked<Pick<Response, 'cookie'>> => ({
   cookie: jest.fn(),
 });
 
+const refreshCookieOptions = {
+  httpOnly: true,
+  secure: false,
+  sameSite: 'strict',
+  path: '/api/auth',
+};
+
 describe('AuthController', () => {
+  const originalNodeEnv = process.env.NODE_ENV;
   let controller: AuthController;
   let mockRegisterUser: jest.Mocked<IAction<User>>;
   let mockLoginUser: jest.Mocked<IAction<Pick<AuthUser, 'email' | 'password'>, ILoginOutput>>;
@@ -32,6 +40,10 @@ describe('AuthController', () => {
       mockRefreshToken,
       mockLogoutUser,
     );
+  });
+
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
   });
 
   describe('register', () => {
@@ -61,10 +73,23 @@ describe('AuthController', () => {
 
       await controller.login({ body }, response);
 
+      expect(response.cookie).toHaveBeenCalledWith(
+        'refreshToken',
+        'refresh.token',
+        refreshCookieOptions,
+      );
+    });
+
+    it('marks the cookie secure in production', async () => {
+      process.env.NODE_ENV = 'production';
+      const response = makeResponse() as unknown as Response;
+      mockLoginUser.call.mockResolvedValue(loginOutput);
+
+      await controller.login({ body }, response);
+
       expect(response.cookie).toHaveBeenCalledWith('refreshToken', 'refresh.token', {
-        httpOnly: true,
+        ...refreshCookieOptions,
         secure: true,
-        sameSite: 'strict',
       });
     });
 
@@ -95,9 +120,21 @@ describe('AuthController', () => {
       await controller.refresh({ body }, response);
 
       expect(response.cookie).toHaveBeenCalledWith('refreshToken', 'new.refresh.token', {
-        httpOnly: true,
+        ...refreshCookieOptions,
+        maxAge: refreshOutput.maxCookieAge,
+      });
+    });
+
+    it('marks the cookie secure in production', async () => {
+      process.env.NODE_ENV = 'production';
+      const response = makeResponse() as unknown as Response;
+      mockRefreshToken.call.mockResolvedValue(refreshOutput);
+
+      await controller.refresh({ body }, response);
+
+      expect(response.cookie).toHaveBeenCalledWith('refreshToken', 'new.refresh.token', {
+        ...refreshCookieOptions,
         secure: true,
-        sameSite: 'strict',
         maxAge: refreshOutput.maxCookieAge,
       });
     });
@@ -127,9 +164,7 @@ describe('AuthController', () => {
       await controller.logout({ body }, response);
 
       expect(response.cookie).toHaveBeenCalledWith('refreshToken', '', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
+        ...refreshCookieOptions,
         maxAge: 0,
       });
     });

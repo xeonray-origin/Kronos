@@ -71,7 +71,6 @@ router.post(
 
 router.get('/refresh', async (request: Request, response: Response, next: NextFunction) => {
   try {
-    console.log(request.cookies);
     const { refreshToken } = request.cookies;
     const result = await controller.refresh({ body: { refreshToken } }, response);
     response.status(200).json(result);
@@ -80,7 +79,7 @@ router.get('/refresh', async (request: Request, response: Response, next: NextFu
   }
 });
 
-router.get('/logout', async (request: Request, response: Response, next: NextFunction) => {
+router.post('/logout', async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { refreshToken } = request.cookies;
     const result = await controller.logout({ body: { refreshToken } }, response);

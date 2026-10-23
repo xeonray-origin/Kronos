@@ -13,6 +13,10 @@ export interface IRefreshResponse {
   token: string;
 }
 
+export interface ILogoutResponse {
+  success: boolean;
+}
+
 export interface IRegisterPayload {
   name: { firstName: string; lastName: string };
   email: string;

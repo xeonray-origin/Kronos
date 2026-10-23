@@ -37,9 +37,21 @@ describe('auth route', () => {
     expect(call?.[1]).toBe(mockLimiter);
   });
 
-  it.each(['/refresh', '/logout'])('does not rate limit GET %s', (path) => {
-    const call = mockRouter.get.mock.calls.find(([route]) => route === path);
+  it('does not rate limit GET /refresh', () => {
+    const call = mockRouter.get.mock.calls.find(([route]) => route === '/refresh');
 
     expect(call).toHaveLength(2);
+  });
+
+  it('registers /logout as POST without a rate limiter', () => {
+    const call = mockRouter.post.mock.calls.find(([route]) => route === '/logout');
+
+    expect(call).toHaveLength(2);
+  });
+
+  it('does not register /logout as GET', () => {
+    const call = mockRouter.get.mock.calls.find(([route]) => route === '/logout');
+
+    expect(call).toBeUndefined();
   });
 });

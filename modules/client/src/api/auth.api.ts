@@ -1,5 +1,11 @@
 import client from './client';
-import type { IAuthPayload, IRefreshResponse, IRegisterPayload, IRegisterResponse } from '@/types';
+import type {
+  IAuthPayload,
+  ILogoutResponse,
+  IRefreshResponse,
+  IRegisterPayload,
+  IRegisterResponse,
+} from '@/types';
 
 export const initateLogin = (payload: IAuthPayload) =>
   client.post('/auth/login', payload).then((response) => response.data);
@@ -9,3 +15,6 @@ export const refreshSession = (): Promise<IRefreshResponse> =>
 
 export const initiateRegister = (payload: IRegisterPayload): Promise<IRegisterResponse> =>
   client.post('/auth/register', payload).then((response) => response.data);
+
+export const logout = (): Promise<ILogoutResponse> =>
+  client.post('/auth/logout').then((response) => response.data);

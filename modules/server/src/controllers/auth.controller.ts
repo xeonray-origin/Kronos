@@ -1,7 +1,15 @@
 import { AuthUser, User } from '@/entities';
 import { IAction, IRequest, IValidator, SessionInfo } from '@/interfaces';
-import { Response } from 'express';
+import { CookieOptions, Response } from 'express';
 import _ from 'lodash';
+
+const refreshCookieOptions = (): CookieOptions => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+  path: '/api/auth',
+});
+
 export default class AuthController {
   constructor(
     protected registerUser: IAction<User>,
@@ -35,11 +43,7 @@ export default class AuthController {
   }> {
     const { body: payload } = request;
     const result = await this.loginUser.call(payload);
-    response.cookie('refreshToken', result.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
+    response.cookie('refreshToken', result.refreshToken, refreshCookieOptions());
     return _.omit(result, ['refreshToken']);
   }
 
@@ -53,9 +57,7 @@ export default class AuthController {
     const { body: payload } = request;
     const result = await this.refreshToken.call(payload);
     response.cookie('refreshToken', result.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      ...refreshCookieOptions(),
       maxAge: result.maxCookieAge,
     });
     return _.omit(result, ['refreshToken']);
@@ -69,9 +71,7 @@ export default class AuthController {
   }> {
     const { body: payload } = request;
     response.cookie('refreshToken', '', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      ...refreshCookieOptions(),
       maxAge: 0,
     });
     return this.logoutUser.call(payload);
