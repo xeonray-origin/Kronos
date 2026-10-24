@@ -4,6 +4,12 @@ export interface IHash {
   verifyPassword(password: string, salt: string, storedHash: string): Promise<boolean>;
 }
 
+export interface IPasswordHasher {
+  hash(password: string): Promise<string>;
+  verify(storedHash: string, password: string): Promise<boolean>;
+  isCurrentFormat(storedHash: string): boolean;
+}
+
 export type HashAlgorithm = 'sha256';
 
 export type JwtTokenPayload = {

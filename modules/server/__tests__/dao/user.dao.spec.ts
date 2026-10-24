@@ -5,6 +5,7 @@ import { User as UserModel, AuthUser as AuthUserModel } from '@/models';
 jest.mock('@/models', () => {
   const MockAuthUser = jest.fn();
   (MockAuthUser as any).findById = jest.fn();
+  (MockAuthUser as any).updateOne = jest.fn();
   return {
     User: {
       create: jest.fn(),
@@ -24,6 +25,7 @@ const mockFindByIdAndUpdate = UserModel.findByIdAndUpdate as jest.Mock;
 const mockFindByIdAndDelete = UserModel.findByIdAndDelete as jest.Mock;
 const mockAuthUserClass = AuthUserModel as unknown as jest.Mock;
 const mockAuthUserFindById = (AuthUserModel as any).findById as jest.Mock;
+const mockAuthUserUpdateOne = (AuthUserModel as any).updateOne as jest.Mock;
 
 describe('UserDAO', () => {
   let dao: UserDAO;
@@ -66,6 +68,19 @@ describe('UserDAO', () => {
       expect(mockAuthUserClass).toHaveBeenCalledWith(input);
       expect(mockSave).toHaveBeenCalled();
       expect(result).toEqual(savedDoc.toObject());
+    });
+  });
+
+  describe('updatePasswordHash', () => {
+    it('replaces the password and removes the legacy salt', async () => {
+      mockAuthUserUpdateOne.mockResolvedValueOnce({ acknowledged: true, modifiedCount: 1 });
+
+      await dao.updatePasswordHash(userId, '$argon2id$hash');
+
+      expect(mockAuthUserUpdateOne).toHaveBeenCalledWith(
+        { _id: userId },
+        { $set: { password: '$argon2id$hash' }, $unset: { salt: 1 } },
+      );
     });
   });
 

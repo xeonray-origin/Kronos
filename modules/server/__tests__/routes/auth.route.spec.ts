@@ -21,7 +21,8 @@ jest.mock('@/actions', () => ({
   LogoutUser: jest.fn(),
 }));
 jest.mock('@/utils', () => ({
-  Hash: jest.fn(() => ({ hashPassword: jest.fn(), verifyPassword: jest.fn() })),
+  Hash: jest.fn(() => ({ verifyPassword: jest.fn() })),
+  Argon2Hash: jest.fn(() => ({ hash: jest.fn() })),
   JWTToken: jest.fn(),
   userValidator: {},
   loginValidator: {},

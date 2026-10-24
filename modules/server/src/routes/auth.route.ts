@@ -5,7 +5,7 @@ import SessionDAO from '@/dao/session.dao';
 import { AuthUser } from '@/entities';
 import { IValidator } from '@/interfaces';
 import { authRateLimiter } from '@/middlewares/rate-limit.middleware';
-import { Hash, userValidator, loginValidator, JWTToken } from '@/utils';
+import { Argon2Hash, Hash, userValidator, loginValidator, JWTToken } from '@/utils';
 import express, { NextFunction, Request, Response, Router } from 'express';
 import _ from 'lodash';
 
@@ -13,13 +13,10 @@ const userDAO = new services.auth.DAO();
 const sessionDAO = new SessionDAO();
 const validator = services.auth.validator as unknown as IValidator<AuthUser>;
 const cryptoHash = new Hash('sha256', 8);
+const argon2Hash = new Argon2Hash();
 const jwtToken = new JWTToken();
 
-const RegisterUserAction = new RegisterUser(
-  validator,
-  userDAO,
-  cryptoHash.hashPassword.bind(cryptoHash),
-);
+const RegisterUserAction = new RegisterUser(validator, userDAO, argon2Hash.hash.bind(argon2Hash));
 
 const RefreshTokenAction = new RefreshToken(sessionDAO, userDAO, jwtToken);
 
@@ -27,6 +24,7 @@ const LoginUserAction = new LoginUser(
   loginValidator as unknown as IValidator<AuthUser>,
   userDAO,
   sessionDAO,
+  argon2Hash,
   cryptoHash.verifyPassword.bind(cryptoHash),
   jwtToken,
 );

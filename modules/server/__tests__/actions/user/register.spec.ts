@@ -10,9 +10,7 @@ describe('RegisterUser', () => {
   let registerUser: RegisterUser;
   let mockValidator: jest.Mocked<IValidator<AuthUser>>;
   let mockUserDAO: jest.Mocked<IUserDAO>;
-  let mockEncryptPassword: jest.MockedFunction<
-    (password: string) => Promise<{ password: string; salt: string }>
-  >;
+  let mockEncryptPassword: jest.MockedFunction<(password: string) => Promise<string>>;
 
   const payload = {
     _id: new Types.ObjectId(),
@@ -26,13 +24,14 @@ describe('RegisterUser', () => {
     labelRef: new Types.ObjectId(),
   };
 
-  const encryptedPassword = { password: 'hashed_pw', salt: 'salt_abc' };
+  const encryptedPassword = '$argon2id$v=19$m=19456,t=2,p=1$c2FsdA$aGFzaA';
 
   beforeEach(() => {
     mockValidator = { validate: jest.fn() };
     mockUserDAO = {
       create: jest.fn(),
       storePasswordHash: jest.fn(),
+      updatePasswordHash: jest.fn(),
       findByEmail: jest.fn(),
       findAuthByEmail: jest.fn(),
       findById: jest.fn(),
@@ -94,11 +93,11 @@ describe('RegisterUser', () => {
     expect(mockUserDAO.create).toHaveBeenCalled();
     const createArg = mockUserDAO.create.mock.calls[0]![0] as any;
     expect(createArg).not.toHaveProperty('confirmPassword');
-    expect(createArg.password).toBe(encryptedPassword.password);
+    expect(createArg).not.toHaveProperty('password');
+    expect(createArg).not.toHaveProperty('salt');
     expect(mockUserDAO.storePasswordHash).toHaveBeenCalledWith({
       _id: createdUser._id,
-      password: encryptedPassword.password,
-      salt: encryptedPassword.salt,
+      password: encryptedPassword,
     });
     expect(result).toBe(createdUser);
   });

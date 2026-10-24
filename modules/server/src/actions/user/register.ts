@@ -1,7 +1,6 @@
 import { AuthUser, User } from '@/entities';
 import { ValidationError } from '@/errors';
 import { IAction, IUserDAO, IValidator } from '@/interfaces';
-import _ from 'lodash';
 
 type Payload = Pick<
   AuthUser,
@@ -11,7 +10,7 @@ class RegisterUser implements IAction<User> {
   constructor(
     protected validator: IValidator<AuthUser>,
     protected userDAO: IUserDAO,
-    protected encryptPassword: (password: string) => Promise<{ password: string; salt: string }>,
+    protected encryptPassword: (password: string) => Promise<string>,
   ) {}
   async call(payload: Payload): Promise<User> {
     const { isValid, errors = [], value } = this.validator.validate(payload);
@@ -28,12 +27,11 @@ class RegisterUser implements IAction<User> {
     if (existingUser) {
       throw new ValidationError('User with this email already exists');
     }
-    const { confirmPassword, ...finalPayload } = payload;
-    const { password, salt } = await this.encryptPassword(finalPayload.password);
-    _.assign(finalPayload, { password, salt });
+    const { confirmPassword, password: plainPassword, salt, ...finalPayload } = payload;
+    const password = await this.encryptPassword(plainPassword);
     const createdUser: User = await this.userDAO.create(finalPayload as AuthUser);
     if (createdUser._id) {
-      await this.userDAO.storePasswordHash({ _id: createdUser._id, password, salt });
+      await this.userDAO.storePasswordHash({ _id: createdUser._id, password });
     }
     return createdUser;
   }

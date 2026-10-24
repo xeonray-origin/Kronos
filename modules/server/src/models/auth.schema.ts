@@ -14,7 +14,6 @@ const authSchema = new Schema(
     },
     salt: {
       type: String,
-      required: true,
     },
   },
   {

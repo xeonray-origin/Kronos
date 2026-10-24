@@ -30,6 +30,7 @@ describe('RefreshToken', () => {
     mockUserDAO = {
       create: jest.fn(),
       storePasswordHash: jest.fn(),
+      updatePasswordHash: jest.fn(),
       findByEmail: jest.fn(),
       findAuthByEmail: jest.fn(),
       findById: jest.fn(),

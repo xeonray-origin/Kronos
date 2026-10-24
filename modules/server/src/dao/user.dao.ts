@@ -14,6 +14,10 @@ export class UserDAO implements IUserDAO {
     return createAuthUser.toObject() as unknown as AuthUser;
   }
 
+  async updatePasswordHash(_id: AuthUser['_id'], password: string): Promise<void> {
+    await AuthUserModel.updateOne({ _id }, { $set: { password }, $unset: { salt: 1 } });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const user = await UserModel.findOne({ email });
     return user ? (user.toObject() as unknown as User) : null;
