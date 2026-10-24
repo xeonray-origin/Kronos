@@ -1,5 +1,5 @@
 <span>
-  <img src="./documentation/assets/hero.jpg" height="360px" />
+  <img src="./documentation/assets/hero.gif" height="360px" />
 <span>
 
 # Kronos
