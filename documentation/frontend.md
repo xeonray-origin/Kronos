@@ -237,7 +237,7 @@ On a full page reload, `SessionGuard` restores the session from the refresh cook
 
 | Prop            | Type                       | Default           |
 | --------------- | -------------------------- | ----------------- |
-| `appName`       | `string`                   | `'Tempo'`         |
+| `appName`       | `string`                   | `'Kronos'`        |
 | `placeholder`   | `string`                   | `'Add a task...'` |
 | `onAddTask`     | `() => void`               | —                 |
 | `onToggleTheme` | `(value: boolean) => void` | required          |

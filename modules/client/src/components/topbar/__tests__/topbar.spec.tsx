@@ -13,7 +13,7 @@ describe('Topbar', () => {
     it('renders with default app name', () => {
       render(<Topbar onToggleTheme={onToggleTheme} />);
 
-      expect(screen.getByText('Tempo')).toBeInTheDocument();
+      expect(screen.getByText('Kronos')).toBeInTheDocument();
     });
 
     it('renders with custom app name', () => {
