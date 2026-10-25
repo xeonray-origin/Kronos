@@ -49,6 +49,12 @@ describe('userValidator', () => {
     expect(result.isValid).toBe(false);
   });
 
+  it('accepts a missing phoneNumber', () => {
+    const { phoneNumber, ...withoutPhoneNumber } = validInput;
+    const result = userValidator.validate(withoutPhoneNumber);
+    expect(result.isValid).toBe(true);
+  });
+
   it('rejects a phoneNumber shorter than 10 digits', () => {
     const result = userValidator.validate({ ...validInput, phoneNumber: '123' });
     expect(result.isValid).toBe(false);

@@ -10,7 +10,7 @@ const userValidator = z
       lastName: z.string().min(1),
     }),
     role: z.enum(['user', 'admin']),
-    phoneNumber: z.string().min(10).max(15),
+    phoneNumber: z.string().min(10).max(15).optional(),
     confirmPassword: z.string().min(6),
   })
   .refine((data) => data.password === data.confirmPassword, {

@@ -41,10 +41,11 @@ export function SignupForm() {
     try {
       const [firstName, ...rest] = name.trim().split(/\s+/);
       const lastName = rest.join(' ');
+      const trimmedPhoneNumber = phoneNumber.trim();
       await authApi.initiateRegister({
         name: { firstName: firstName!, lastName },
         email,
-        phoneNumber,
+        ...(trimmedPhoneNumber && { phoneNumber: trimmedPhoneNumber }),
         password,
         confirmPassword,
         role: 'user',
@@ -90,7 +91,7 @@ export function SignupForm() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-foreground">Phone number</label>
+          <label className="text-sm font-medium text-foreground">Phone number (optional)</label>
           <Input
             type="tel"
             placeholder="+1 555 123 4567"

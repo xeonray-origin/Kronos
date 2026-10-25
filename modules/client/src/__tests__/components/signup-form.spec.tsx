@@ -34,7 +34,7 @@ describe('SignupForm', () => {
 
     it('renders the phone number input with label and placeholder', () => {
       render(<SignupForm />);
-      expect(screen.getByText('Phone number')).toBeInTheDocument();
+      expect(screen.getByText('Phone number (optional)')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('+1 555 123 4567')).toBeInTheDocument();
     });
 
@@ -85,6 +85,39 @@ describe('SignupForm', () => {
           name: { firstName: 'Jane', lastName: 'Doe' },
           email: 'jane@example.com',
           phoneNumber: '5551234567',
+          password: 'secret123',
+          confirmPassword: 'secret123',
+          role: 'user',
+        });
+      });
+    });
+
+    it('omits phoneNumber when the field is left blank', async () => {
+      (authApi.initiateRegister as jest.Mock).mockResolvedValue({});
+      render(<SignupForm />);
+
+      fireEvent.change(screen.getByPlaceholderText('Alex Johnson'), {
+        target: { value: 'Jane Doe' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('alex@company.com'), {
+        target: { value: 'jane@example.com' },
+      });
+      fireEvent.change(screen.getByPlaceholderText('+1 555 123 4567'), {
+        target: { value: '   ' },
+      });
+      const [passwordInput, confirmInput] = screen.getAllByPlaceholderText('••••••••') as [
+        HTMLInputElement,
+        HTMLInputElement,
+      ];
+      fireEvent.change(passwordInput, { target: { value: 'secret123' } });
+      fireEvent.change(confirmInput, { target: { value: 'secret123' } });
+
+      fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
+
+      await waitFor(() => {
+        expect(authApi.initiateRegister).toHaveBeenCalledWith({
+          name: { firstName: 'Jane', lastName: 'Doe' },
+          email: 'jane@example.com',
           password: 'secret123',
           confirmPassword: 'secret123',
           role: 'user',
