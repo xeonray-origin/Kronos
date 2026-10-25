@@ -12,7 +12,7 @@ import _ from 'lodash';
 const userDAO = new services.auth.DAO();
 const sessionDAO = new SessionDAO();
 const validator = services.auth.validator as unknown as IValidator<AuthUser>;
-const cryptoHash = new Hash('sha256', 8);
+const cryptoHash = new Hash('sha256');
 const argon2Hash = new Argon2Hash();
 const jwtToken = new JWTToken();
 

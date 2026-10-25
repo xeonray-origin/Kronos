@@ -1,6 +1,4 @@
 export interface IHash {
-  hashPassword(password: string): Promise<{ password: string; salt: string }>;
-  generateSalt(length?: number): Promise<string>;
   verifyPassword(password: string, salt: string, storedHash: string): Promise<boolean>;
 }
 
