@@ -57,18 +57,28 @@ export class JWTToken implements IJwtToken {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
     const [encodedHeader, encodedPayload, encodedSignature] = parts as [string, string, string];
-    const encodedExpectedSignature = crypto
-      .createHmac('sha256', secret)
-      .update(`${encodedHeader}.${encodedPayload}`)
-      .digest('base64url');
-    const isSignatureValid = crypto.timingSafeEqual(
-      Buffer.from(encodedSignature),
-      Buffer.from(encodedExpectedSignature),
+    const expectedSignature = Buffer.from(
+      crypto
+        .createHmac('sha256', secret)
+        .update(`${encodedHeader}.${encodedPayload}`)
+        .digest('base64url'),
     );
-    if (!isSignatureValid) return null;
-    const payload = JSON.parse(await this.base64UrlDecode(encodedPayload));
-    if (payload.exp && Date.now() / 1000 > payload.exp) return null;
-    return payload;
+    const receivedSignature = Buffer.from(encodedSignature);
+    if (
+      receivedSignature.length !== expectedSignature.length ||
+      !crypto.timingSafeEqual(receivedSignature, expectedSignature)
+    ) {
+      return null;
+    }
+    try {
+      const header = JSON.parse(await this.base64UrlDecode(encodedHeader));
+      if (header?.alg !== 'HS256') return null;
+      const payload = JSON.parse(await this.base64UrlDecode(encodedPayload));
+      if (typeof payload?.exp !== 'number' || Date.now() / 1000 > payload.exp) return null;
+      return payload;
+    } catch {
+      return null;
+    }
   }
 
   public async verifyToken(token: string): Promise<JwtTokenPayload | null> {
