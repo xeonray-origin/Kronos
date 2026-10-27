@@ -9,5 +9,7 @@ export const getTasks = () =>
 export const createTask = (input: CreateTaskInput) =>
   client.post<ITaskResponse>('/task/create', input).then((response) => toTask(response.data));
 
+export const deleteTask = (id: string) => client.delete(`/task/delete/${id}`).then(() => undefined);
+
 export const updateTask = (id: string, input: UpdateTaskInput) =>
   client.put<ITaskResponse>(`/task/update/${id}`, input).then((response) => toTask(response.data));

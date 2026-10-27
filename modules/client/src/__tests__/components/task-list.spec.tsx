@@ -80,3 +80,13 @@ describe('TaskList', () => {
     expect(onToggleStatus).toHaveBeenCalledWith('2');
   });
 });
+
+describe('TaskList delete', () => {
+  it('forwards onDelete to each task row', () => {
+    const onDelete = jest.fn();
+    render(<TaskList tasks={[UNLABELED_TASK]} onDelete={onDelete} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete task' }));
+    expect(onDelete).toHaveBeenCalledWith('3');
+  });
+});

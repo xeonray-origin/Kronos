@@ -5,7 +5,13 @@ import type { TaskListProps } from '@/types';
 
 const UNLABELED_KEY = '__unlabeled__';
 
-export function TaskList({ tasks, activeLabel, onSelectTimerTask, onToggleStatus }: TaskListProps) {
+export function TaskList({
+  tasks,
+  activeLabel,
+  onSelectTimerTask,
+  onToggleStatus,
+  onDelete,
+}: TaskListProps) {
   const groups = groupTasksByLabel(tasks);
   const visible = activeLabel ? groups.filter((group) => group.label === activeLabel) : groups;
 
@@ -33,6 +39,7 @@ export function TaskList({ tasks, activeLabel, onSelectTimerTask, onToggleStatus
                 key={task.id}
                 handleTimer={onSelectTimerTask}
                 onToggleStatus={onToggleStatus}
+                onDelete={onDelete}
                 {...task}
               />
             ))}

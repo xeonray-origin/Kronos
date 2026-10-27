@@ -53,6 +53,26 @@ describe('Task', () => {
     expect(onToggleStatus).toHaveBeenCalledWith('42');
   });
 
+  it('calls onDelete with the task id when the delete button is clicked', () => {
+    const onDelete = jest.fn();
+    render(
+      <Task id="42" title="Bin me" status={TaskStatus.BACKLOG} userId="u1" onDelete={onDelete} />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete task' }));
+    expect(onDelete).toHaveBeenCalledWith('42');
+  });
+
+  it('hides the delete button without onDelete or an id', () => {
+    const { rerender } = render(
+      <Task id="42" title="Keep" status={TaskStatus.BACKLOG} userId="u1" />,
+    );
+    expect(screen.queryByRole('button', { name: 'Delete task' })).not.toBeInTheDocument();
+
+    rerender(<Task title="Keep" status={TaskStatus.BACKLOG} userId="u1" onDelete={jest.fn()} />);
+    expect(screen.queryByRole('button', { name: 'Delete task' })).not.toBeInTheDocument();
+  });
+
   it('does not call onToggleStatus when the task has no id', () => {
     const onToggleStatus = jest.fn();
     render(

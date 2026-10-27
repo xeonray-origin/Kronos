@@ -20,6 +20,9 @@ let mockTasks: ITask[] = [];
 let mockStatus = 'idle';
 let mockActiveLabel: string | null = null;
 const mockSelectLabel = jest.fn();
+const mockDeleteTask = jest.fn();
+const mockUndoDelete = jest.fn();
+let mockPendingDeletes: { id: string; title: string }[] = [];
 
 jest.mock('@/hooks/useTasks', () => ({
   useTasks: () => ({
@@ -30,6 +33,9 @@ jest.mock('@/hooks/useTasks', () => ({
     fetchTasks: jest.fn(),
     selectLabel: mockSelectLabel,
     toggleTaskStatus: jest.fn(),
+    deleteTask: mockDeleteTask,
+    undoDelete: mockUndoDelete,
+    pendingDeletes: mockPendingDeletes,
   }),
 }));
 
@@ -38,6 +44,23 @@ beforeEach(() => {
   mockStatus = 'idle';
   mockActiveLabel = null;
   mockSelectLabel.mockClear();
+  mockDeleteTask.mockClear();
+  mockUndoDelete.mockClear();
+  mockPendingDeletes = [];
+});
+
+describe('AppLayout delete', () => {
+  it('deletes a task from its row and offers undo for pending deletes', () => {
+    mockTasks = [MOCK_TASK];
+    mockPendingDeletes = [{ id: '2', title: MOCK_TASK_2.title }];
+    render(<AppLayout />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Delete task' }));
+    expect(mockDeleteTask).toHaveBeenCalledWith('1');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+    expect(mockUndoDelete).toHaveBeenCalledWith('2');
+  });
 });
 
 describe('AppLayout', () => {

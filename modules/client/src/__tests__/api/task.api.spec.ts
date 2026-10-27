@@ -1,10 +1,10 @@
-import { createTask, getTasks, updateTask } from '@/api/task.api';
+import { createTask, deleteTask, getTasks, updateTask } from '@/api/task.api';
 import client from '@/api/client';
 import { TaskStatus } from '@/types';
 
 jest.mock('@/api/client', () => ({
   __esModule: true,
-  default: { get: jest.fn(), post: jest.fn(), put: jest.fn() },
+  default: { get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn() },
 }));
 
 describe('getTasks', () => {
@@ -65,5 +65,20 @@ describe('updateTask', () => {
     (client.put as jest.Mock).mockRejectedValue(new Error('Network error'));
 
     await expect(updateTask('3', patch)).rejects.toThrow('Network error');
+  });
+});
+
+describe('deleteTask', () => {
+  it('calls DELETE /task/delete/:id and resolves with nothing', async () => {
+    (client.delete as jest.Mock).mockResolvedValue({ data: { message: 'deleted' } });
+
+    await expect(deleteTask('4')).resolves.toBeUndefined();
+    expect(client.delete).toHaveBeenCalledWith('/task/delete/4');
+  });
+
+  it('rejects when the request fails', async () => {
+    (client.delete as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+    await expect(deleteTask('4')).rejects.toThrow('Network error');
   });
 });

@@ -5,10 +5,10 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { taskSlice } from '@/store/slice/task.slice';
 import { authSlice } from '@/store/slice/auth.slice';
 import { TaskStatus, type ITasksState } from '@/types';
-import { useTasks } from '@/hooks/useTasks';
+import { useTasks, DELETE_UNDO_MS } from '@/hooks/useTasks';
 
 jest.mock('@/api/task.api');
-import { createTask, getTasks, updateTask } from '@/api/task.api';
+import { createTask, deleteTask, getTasks, updateTask } from '@/api/task.api';
 
 const MOCK_TASK = { id: '1', title: 'Task', userId: 'u1', status: TaskStatus.BACKLOG };
 const DONE_TASK = { id: '9', title: 'Done', userId: 'u1', status: TaskStatus.DONE };
@@ -174,5 +174,84 @@ describe('useTasks', () => {
       result.current.selectLabel('frontend');
     });
     expect(result.current.activeLabel).toBeNull();
+  });
+
+  describe('deleteTask', () => {
+    const MOCK_TASK_2 = { id: '2', title: 'Second', userId: 'u1', status: TaskStatus.BACKLOG };
+
+    beforeEach(() => jest.useFakeTimers());
+    afterEach(() => jest.useRealTimers());
+
+    it('removes the task optimistically and holds the API call until the undo window ends', async () => {
+      (deleteTask as jest.Mock).mockResolvedValue(undefined);
+      const { result } = renderHook(() => useTasks(), {
+        wrapper: makeWrapper({ items: [MOCK_TASK, MOCK_TASK_2] }),
+      });
+
+      act(() => result.current.deleteTask('1'));
+
+      expect(result.current.tasks).toEqual([MOCK_TASK_2]);
+      expect(result.current.pendingDeletes).toEqual([{ id: '1', title: 'Task' }]);
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(DELETE_UNDO_MS - 1);
+      });
+      expect(deleteTask).not.toHaveBeenCalled();
+
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(1);
+      });
+      expect(deleteTask).toHaveBeenCalledWith('1');
+      expect(result.current.pendingDeletes).toEqual([]);
+      expect(result.current.tasks).toEqual([MOCK_TASK_2]);
+    });
+
+    it('restores the task at its original position and never calls the API when undone', async () => {
+      const { result } = renderHook(() => useTasks(), {
+        wrapper: makeWrapper({ items: [MOCK_TASK, MOCK_TASK_2] }),
+      });
+
+      act(() => result.current.deleteTask('1'));
+      act(() => result.current.undoDelete('1'));
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(DELETE_UNDO_MS * 2);
+      });
+
+      expect(result.current.tasks).toEqual([MOCK_TASK, MOCK_TASK_2]);
+      expect(result.current.pendingDeletes).toEqual([]);
+      expect(deleteTask).not.toHaveBeenCalled();
+    });
+
+    it('rolls the task back when the API call fails', async () => {
+      (deleteTask as jest.Mock).mockRejectedValue(new Error('Network error'));
+      const { result } = renderHook(() => useTasks(), {
+        wrapper: makeWrapper({ items: [MOCK_TASK, MOCK_TASK_2] }),
+      });
+
+      act(() => result.current.deleteTask('1'));
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(DELETE_UNDO_MS);
+      });
+
+      expect(result.current.tasks).toEqual([MOCK_TASK, MOCK_TASK_2]);
+      expect(result.current.pendingDeletes).toEqual([]);
+    });
+
+    it('ignores unknown ids, repeat deletes and undo of a task that is not pending', async () => {
+      (deleteTask as jest.Mock).mockResolvedValue(undefined);
+      const { result } = renderHook(() => useTasks(), {
+        wrapper: makeWrapper({ items: [MOCK_TASK] }),
+      });
+
+      act(() => result.current.deleteTask('missing'));
+      act(() => result.current.undoDelete('1'));
+      expect(result.current.tasks).toEqual([MOCK_TASK]);
+
+      act(() => result.current.deleteTask('1'));
+      act(() => result.current.deleteTask('1'));
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(DELETE_UNDO_MS);
+      });
+      expect(deleteTask).toHaveBeenCalledTimes(1);
+    });
   });
 });

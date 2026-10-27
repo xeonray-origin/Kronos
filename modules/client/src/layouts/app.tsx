@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Sidebar, TaskList, Timer, TimerTaskCard } from '@/components';
+import { Sidebar, TaskList, Timer, TimerTaskCard, UndoToast } from '@/components';
 import { useTasks } from '@/hooks/useTasks';
 import { labelCounts } from '@/lib/labels';
 import type { ITask } from '@/types';
 
 export default function AppLayout() {
-  const { tasks, apiStatus, activeLabel, fetchTasks, selectLabel, toggleTaskStatus } = useTasks();
+  const {
+    tasks,
+    apiStatus,
+    activeLabel,
+    fetchTasks,
+    selectLabel,
+    toggleTaskStatus,
+    deleteTask,
+    undoDelete,
+    pendingDeletes,
+  } = useTasks();
   const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -36,6 +46,7 @@ export default function AppLayout() {
             activeLabel={activeLabel}
             onSelectTimerTask={handleSelectTimerTask}
             onToggleStatus={toggleTaskStatus}
+            onDelete={deleteTask}
           />
         )}
       </div>
@@ -50,6 +61,7 @@ export default function AppLayout() {
           )}
         </div>
       </div>
+      <UndoToast items={pendingDeletes} onUndo={undoDelete} />
     </main>
   );
 }

@@ -1,4 +1,4 @@
-import { CalendarIcon, CheckIcon, ClockIcon } from 'lucide-react';
+import { CalendarIcon, CheckIcon, ClockIcon, Trash2Icon } from 'lucide-react';
 import { Badge } from '@/components/base/badge';
 import { cn } from '@/lib/utils';
 import { formatDueDate } from '@/lib/dates';
@@ -14,6 +14,7 @@ export function Task({
   status,
   handleTimer: showTimer,
   onToggleStatus,
+  onDelete,
 }: TaskProps) {
   const done = status === TaskStatus.DONE;
   const hasLabels = labels !== undefined && labels.length > 0;
@@ -70,6 +71,16 @@ export function Task({
             </button>
           )}
         </div>
+      )}
+      {onDelete && id && (
+        <button
+          type="button"
+          onClick={() => onDelete(id)}
+          aria-label="Delete task"
+          className="shrink-0 text-muted-foreground hover:text-destructive transition-colors"
+        >
+          <Trash2Icon className="h-4 w-4" />
+        </button>
       )}
     </div>
   );

@@ -57,6 +57,7 @@ export interface DatePickerProps {
 export interface TaskProps extends ITask {
   handleTimer?: (taskId: string) => void;
   onToggleStatus?: (taskId: string) => void;
+  onDelete?: (taskId: string) => void;
 }
 
 export interface TaskListProps {
@@ -64,6 +65,12 @@ export interface TaskListProps {
   activeLabel?: string | null;
   onSelectTimerTask?: (taskId: string) => void;
   onToggleStatus?: (taskId: string) => void;
+  onDelete?: (taskId: string) => void;
+}
+
+export interface UndoToastProps {
+  items: { id: string; title: string }[];
+  onUndo: (taskId: string) => void;
 }
 
 export interface TimerTaskCardProps {

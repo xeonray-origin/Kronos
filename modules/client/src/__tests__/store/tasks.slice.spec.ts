@@ -2,7 +2,8 @@ import { taskSlice } from '@/store/slice/task.slice';
 import { TaskStatus, type ITasksState } from '@/types';
 
 const reducer = taskSlice.reducer;
-const { setTasks, addTask, updateTask, setStatus, setActiveLabel } = taskSlice.actions;
+const { setTasks, addTask, updateTask, removeTask, restoreTask, setStatus, setActiveLabel } =
+  taskSlice.actions;
 
 const MOCK_TASK = { id: '1', title: 'Task', userId: 'u1', status: TaskStatus.BACKLOG };
 const MOCK_TASK_2 = { id: '2', title: 'Second', userId: 'u1', status: TaskStatus.BACKLOG };
@@ -21,6 +22,24 @@ describe('tasks slice', () => {
     );
     expect(state.items).toEqual([MOCK_TASK_2]);
     expect(state.activeLabel).toBeNull();
+  });
+
+  it('removeTask drops the task with the given id', () => {
+    const state = reducer({ ...initialState, items: [MOCK_TASK, MOCK_TASK_2] }, removeTask('1'));
+    expect(state.items).toEqual([MOCK_TASK_2]);
+  });
+
+  it('removeTask leaves the items alone for an unknown id', () => {
+    const state = reducer({ ...initialState, items: [MOCK_TASK] }, removeTask('missing'));
+    expect(state.items).toEqual([MOCK_TASK]);
+  });
+
+  it('restoreTask re-inserts the task at its original index', () => {
+    const state = reducer(
+      { ...initialState, items: [MOCK_TASK_2] },
+      restoreTask({ task: MOCK_TASK, index: 0 }),
+    );
+    expect(state.items).toEqual([MOCK_TASK, MOCK_TASK_2]);
   });
 
   it('addTask appends a task to the items', () => {
